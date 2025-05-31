@@ -2,7 +2,6 @@ import { useState } from "react";
 import firebase from "/firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { googleProvider, facebookProvider } from "../../firebase.js";
-
 const signin = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -53,7 +52,7 @@ const signin = () => {
                 userCredential = await firebase.auth()
                     .signInWithEmailAndPassword(formData.login, formData.password);
             } catch (emailError) {
-                if (emailError.code === "auth/user-not-found") {
+                if (emailError.code === "auth/invalid-email") {
                     const snapshot = await firebase.firestore()
                         .collection("users")
                         .where("username", "==", formData.login)
@@ -93,7 +92,7 @@ const signin = () => {
             // Redirect based on role
             switch (userData.role) {
                 case "admin":
-                    navigate("/admin/dashboard");
+                    navigate("/");
                     break;
                 case "seller":
                     navigate("/seller/dashboard");
