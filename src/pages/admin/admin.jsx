@@ -189,7 +189,6 @@ const AdminDashboard = () => {
     const handleLogout = async () => {
         try {
             await firebase.auth().signOut();
-            localStorage.removeItem("adminProfileImage"); // Clear profile image on logout
             navigate("/signin");
         } catch (error) {
             console.error("Error signing out:", error);
