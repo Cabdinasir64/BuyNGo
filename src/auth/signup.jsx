@@ -348,7 +348,7 @@ export default function Signup() {
                             type="button"
                             onClick={() => handleSocialLogin("google")}
                             disabled={isLoading}
-                            className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-300 bg-white text-dark-DEFAULT hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-300 bg-white text-dark-DEFAULT hover:bg-gray-100 transition-colors disabled:opacity-50"
                         >
                             <GoogleIcon />
                             <span>Google</span>
@@ -357,7 +357,7 @@ export default function Signup() {
                             type="button"
                             onClick={() => handleSocialLogin("facebook")}
                             disabled={isLoading}
-                            className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-300 bg-white text-dark-DEFAULT hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-300 bg-white text-dark-DEFAULT hover:bg-gray-100 transition-colors disabled:opacity-50"
                         >
                             <FacebookIcon />
                             <span>Facebook</span>
