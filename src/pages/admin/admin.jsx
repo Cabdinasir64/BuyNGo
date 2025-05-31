@@ -76,9 +76,8 @@ const AdminDashboard = () => {
             ));
 
             setSuccess(`User role updated to ${newRole}`);
-            setTimeout(() => setSuccess(""), 3000);
+            setTimeout(() => setSuccess(""), 1500);
         } catch (error) {
-            console.error("Error updating role:", error);
             setErrors({ general: "Failed to update user role" });
         }
     };
@@ -93,7 +92,6 @@ const AdminDashboard = () => {
             setSuccess("User deleted successfully");
             setTimeout(() => setSuccess(""), 3000);
         } catch (error) {
-            console.error("Error deleting user:", error);
             setErrors({ general: "Failed to delete user" });
         }
     };
