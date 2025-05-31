@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import firebase from "/firebase"; // Assuming this path is correct for your project
+import firebase from "/firebase";
 
 const AdminDashboard = () => {
     const user = firebase.auth().currentUser;
