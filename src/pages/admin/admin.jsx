@@ -77,7 +77,7 @@ const AdminDashboard = () => {
             ));
 
             setSuccess(`User role updated to ${newRole}`);
-            setTimeout(() => setSuccess(""), 1500);
+            setTimeout(() => setSuccess(""), 3000);
         } catch (error) {
             setErrors({ general: "Failed to update user role" });
         }
@@ -90,7 +90,7 @@ const AdminDashboard = () => {
         try {
             await firebase.firestore().collection("users").doc(userId).delete();
             setSuccess("User deleted successfully");
-            setTimeout(() => setSuccess(""), 1500);
+            setTimeout(() => setSuccess(""), 3000);
         } catch (error) {
             setErrors({ general: "Failed to delete user" });
         }
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
             localStorage.setItem(user.uid, imageUrl);
             setProfile(prev => ({ ...prev, profileImage: imageUrl }));
             setSuccess("Profile image updated");
-            setTimeout(() => setSuccess(""), 1500);
+            setTimeout(() => setSuccess(""), 3000);
         };
         reader.readAsDataURL(file);
     };
@@ -171,7 +171,7 @@ const AdminDashboard = () => {
             }));
 
             setSuccess("Profile updated successfully");
-            setTimeout(() => setSuccess(""), 1500);
+            setTimeout(() => setSuccess(""), 3000);
         } catch (error) {
             console.error("Error updating profile:", error);
             let errorMsg = "Failed to update profile";
@@ -192,7 +192,6 @@ const AdminDashboard = () => {
             await firebase.auth().signOut();
             navigate("/signin");
         } catch (error) {
-            console.error("Error signing out:", error);
             setErrors({ general: "Failed to logout" });
         }
     };
