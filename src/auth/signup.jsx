@@ -60,7 +60,7 @@ export default function Signup() {
     });
     const [isLoading, setIsLoading] = useState(false);
 
-    // Check if username/email exists (Firebase v8)
+    // Check if username/email exists
     const checkUnique = async (field, value) => {
         const snapshot = await firebase
             .firestore()
@@ -109,7 +109,7 @@ export default function Signup() {
         return valid;
     };
 
-    // Handle Signup (Firebase v8)
+    // Handle Signup 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -129,7 +129,7 @@ export default function Signup() {
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 });
 
-                navigate(`/${formData.role}/dashboard`);
+                navigate(`/signin`);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -140,7 +140,7 @@ export default function Signup() {
         }
     };
 
-    // Social Login (Firebase v8)
+    // Social Login
     const handleSocialLogin = async (provider) => {
         try {
             setIsLoading(true);
@@ -168,13 +168,13 @@ export default function Signup() {
                     .set({
                         username: user.displayName || user.email.split("@")[0],
                         email: user.email,
-                        role: "buyer", // Default role for social login
+                        role: "buyer",
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                     });
             }
 
-            navigate("/buyer/dashboard");
+            navigate("/");
         } catch (err) {
             setError(err.message);
         } finally {
@@ -187,10 +187,10 @@ export default function Signup() {
             <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
                 {/* Header with Branding */}
                 <div className="bg-primary-DEFAULT p-6 text-center">
-                    <h1 className="text-2xl sm:text-3xl font-heading font-bold text-white">
-                        Join BuyNGo
+                    <h1 className="text-2xl sm:text-3xl font-heading font-bold text-primary-light">
+                        Join Our Community
                     </h1>
-                    <p className="text-primary-light mt-1">Create your buyer account</p>
+                    <p className="text-primary-DEFAULT mt-1">Sign up to get started</p>
                 </div>
 
                 <div className="p-6 sm:p-8">
@@ -221,7 +221,7 @@ export default function Signup() {
                                 }}
                                 className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${errors.username
                                     ? "border-accent-red focus:ring-accent-red/30"
-                                    : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/30"
+                                    : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
                                     }`}
                                 placeholder="johndoe"
                                 autoComplete="username"
@@ -251,7 +251,7 @@ export default function Signup() {
                                 }}
                                 className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${errors.email
                                     ? "border-accent-red focus:ring-accent-red/30"
-                                    : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/30"
+                                    : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
                                     }`}
                                 placeholder="john@example.com"
                                 autoComplete="email"
@@ -279,7 +279,7 @@ export default function Signup() {
                                 }}
                                 className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${errors.password
                                     ? "border-accent-red focus:ring-accent-red/30"
-                                    : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/30"
+                                    : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
                                     }`}
                                 placeholder="••••••••"
                                 autoComplete="new-password"
@@ -325,7 +325,7 @@ export default function Signup() {
                                     Creating account...
                                 </span>
                             ) : (
-                                "Create Buyer Account"
+                                "Create Account"
                             )}
                         </button>
                     </form>
