@@ -146,7 +146,7 @@ const AdminDashboard = () => {
 
             if (user.email !== profile.email) {
                 const credential = firebase.auth.EmailAuthProvider.credential(
-                    user.email, // Use current user's email for re-authentication
+                    user.email, 
                     profile.currentPassword
                 );
                 await user.reauthenticateWithCredential(credential);
