@@ -106,7 +106,7 @@ const AdminDashboard = () => {
             localStorage.setItem("adminProfileImage", imageUrl);
             setProfile(prev => ({ ...prev, profileImage: imageUrl }));
             setSuccess("Profile image updated");
-            setTimeout(() => setSuccess(""), 3000);
+            setTimeout(() => setSuccess(""), 1500);
         };
         reader.readAsDataURL(file);
     };
