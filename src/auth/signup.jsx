@@ -129,7 +129,7 @@ export default function Signup() {
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 });
 
-                navigate(`/signin`);
+                navigate(`/`);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -369,7 +369,7 @@ export default function Signup() {
                         <p>
                             Already have an account?{" "}
                             <Link
-                                to="/login"
+                                to="/signin"
                                 className="font-medium text-primary-DEFAULT hover:text-primary-dark"
                             >
                                 Sign in
