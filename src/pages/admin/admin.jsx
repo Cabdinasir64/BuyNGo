@@ -154,9 +154,6 @@ const AdminDashboard = () => {
             }
 
             if (profile.newPassword) {
-                // Re-authenticate before password update if email was also changed, using the *new* email if re-auth for email was successful
-                // Or simply ensure re-authentication happened if only password is changed.
-                const reAuthEmail = user.email; // This should be the email known to Firebase Auth at this point.
                 const credential = firebase.auth.EmailAuthProvider.credential(
                     reAuthEmail,
                     profile.currentPassword
@@ -173,11 +170,11 @@ const AdminDashboard = () => {
             }));
 
             setSuccess("Profile updated successfully");
-            setTimeout(() => setSuccess(""), 3000);
+            setTimeout(() => setSuccess(""), 1500);
         } catch (error) {
             console.error("Error updating profile:", error);
             let errorMsg = "Failed to update profile";
-            if (error.code === "auth/wrong-password") {
+            if (error.code === "auth/invalid-credential") {
                 errorMsg = "Incorrect current password";
             } else if (error.code === "auth/requires-recent-login") {
                 errorMsg = "Please reauthenticate to update sensitive information. You might need to log out and log back in.";
