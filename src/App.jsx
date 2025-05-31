@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SignUp from './auth/signup'
+import SignIn from './auth/signin'
 
 function App() {
 
@@ -8,7 +8,7 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<SignUp />} />
+          <Route path="/" element={<SignIn />} />
         </Routes>
       </Router>
     </>
