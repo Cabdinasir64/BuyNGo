@@ -135,10 +135,10 @@ const signin = () => {
 
             switch (userData.role) {
                 case "admin":
-                    navigate("/admin/dashboard");
+                    navigate("/admin");
                     break;
                 case "seller":
-                    navigate("/seller/dashboard");
+                    navigate("/");
                     break;
                 default:
                     navigate("/");
