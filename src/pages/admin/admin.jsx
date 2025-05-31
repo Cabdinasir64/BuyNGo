@@ -40,7 +40,6 @@ const AdminDashboard = () => {
 
                 setUsers(usersData);
             } catch (error) {
-                console.error("Error fetching users:", error);
                 setErrors({ general: "Failed to load users" });
             } finally {
                 setLoading(false);
