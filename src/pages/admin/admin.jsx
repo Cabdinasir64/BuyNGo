@@ -202,7 +202,7 @@ const AdminDashboard = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 flex font-sans"> {/* Default font Poppins */}
+        <div className="min-h-screen bg-gray-50 flex font-sans">
             {/* Mobile sidebar toggle */}
             <div className="md:hidden fixed top-0 left-0 right-0 bg-primary p-4 flex justify-between items-center z-30 shadow-md">
                 <h1 className="text-xl font-bold text-white font-heading">Admin Dashboard</h1>
@@ -221,8 +221,8 @@ const AdminDashboard = () => {
             </div>
 
             {/* Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static w-64 bg-primary-dark text-white transition-transform duration-200 ease-in-out z-20 flex flex-col shadow-lg`}>
-                <div className="p-4 border-b border-primary"> {/* Adjusted border color */}
+            <aside className={`fixed inset-y-0 left-0 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static w-64 bg-primary-dark text-white transition-transform duration-300 ease-in-out z-20 flex flex-col shadow-lg`}>
+                <div className="p-4 border-b border-primary">
                     <h2 className="text-2xl font-bold font-heading text-center">Admin Panel</h2>
                 </div>
                 <nav className="p-4 space-y-2 flex-grow">
@@ -245,7 +245,7 @@ const AdminDashboard = () => {
                         My Profile
                     </button>
                 </nav>
-                <div className="p-4 border-t border-primary"> {/* Adjusted border color */}
+                <div className="p-4 border-t-2 border-primary">
                     <button
                         onClick={handleLogout}
                         className="w-full px-4 py-3 bg-accent-red hover:bg-accent-red hover:brightness-90 text-white rounded-lg transition-colors duration-150 ease-in-out font-medium"
@@ -256,16 +256,16 @@ const AdminDashboard = () => {
             </aside>
 
             {/* Main content */}
-            <main className="flex-1 md:ml-0 mt-16 md:mt-0"> {/* Adjusted md:ml-0 as sidebar is static or transformed */}
+            <main className="flex-1 md:ml-0 mt-16 md:mt-0">
                 {/* Header */}
-                <header className="bg-white shadow-sm p-6 sticky top-0 md:top-0 z-10"> {/* Made header sticky */}
+                <header className="bg-white shadow-sm p-6 sticky top-0 md:top-0 z-10">
                     <h1 className="text-2xl font-bold text-dark font-heading">
                         {activeTab === "users" ? "User Management" : "My Profile"}
                     </h1>
                 </header>
 
                 {/* Content */}
-                <div className="p-6 overflow-y-auto" style={{ height: 'calc(100vh - 88px)' }}> {/* Adjusted height based on sticky header p-6 (24px padding * 2 + line height ~ 88px) */}
+                <div className="p-6 overflow-y-auto" style={{ height: 'calc(100vh - 88px)' }}>
                     {success && (
                         <div className="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-md shadow">
                             <p className="font-medium">{success}</p>
@@ -307,7 +307,7 @@ const AdminDashboard = () => {
 
                             {loading ? (
                                 <div className="flex justify-center items-center py-12">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-primary"></div>
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-primary-dark"></div>
                                     <p className="ml-4 text-dark-muted">Loading Users...</p>
                                 </div>
                             ) : filteredUsers.length === 0 ? (
@@ -326,7 +326,7 @@ const AdminDashboard = () => {
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200">
                                             {filteredUsers.map((user) => (
-                                                <tr key={user.id} className="hover:bg-gray-50 transition-colors duration-150">
+                                                <tr key={user.id} className="hover:bg-gray-100 transition-colors duration-150">
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
                                                             <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary-light flex items-center justify-center">
@@ -338,7 +338,6 @@ const AdminDashboard = () => {
                                                                 <div className="text-sm font-medium text-dark">
                                                                     {user.displayName || user.email.split("@")[0]}
                                                                 </div>
-                                                                {user.displayName && <div className="text-xs text-dark-muted">{user.email.split("@")[0]}</div>}
                                                             </div>
                                                         </div>
                                                     </td>
@@ -432,7 +431,7 @@ const AdminDashboard = () => {
                                     <label htmlFor="newPassword" className="block text-sm font-medium text-dark-muted mb-1">New Password</label>
                                     <input id="newPassword" type="password" value={profile.newPassword} onChange={(e) => setProfile({ ...profile, newPassword: e.target.value })}
                                         className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.newPassword ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-primary-light focus:border-primary"}`}
-                                        placeholder="Leave empty to keep current password" />
+                                        placeholder="new current password" />
                                     {errors.newPassword && <p className="mt-1 text-sm text-red-600">{errors.newPassword}</p>}
                                 </div>
 
