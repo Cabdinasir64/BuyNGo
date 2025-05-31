@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SignIn from './auth/signin'
-
+import AdminDashboard from './pages/admin/admin'
 function App() {
 
 
@@ -8,7 +7,7 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<SignIn />} />
+          <Route path="/" element={<AdminDashboard />} />
         </Routes>
       </Router>
     </>
