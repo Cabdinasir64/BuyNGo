@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import firebase from "/firebase"; // Assuming this path is correct for your project
 
 const AdminDashboard = () => {
+    const user = firebase.auth().currentUser;
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("users");
     const [users, setUsers] = useState([]);
@@ -17,7 +18,7 @@ const AdminDashboard = () => {
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
-        profileImage: localStorage.getItem("adminProfileImage") || "",
+        profileImage: localStorage.getItem(user.uid) || "",
     });
 
     const [errors, setErrors] = useState({});
@@ -99,11 +100,11 @@ const AdminDashboard = () => {
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
+        const user = firebase.auth().currentUser;
         const reader = new FileReader();
         reader.onloadend = () => {
             const imageUrl = reader.result;
-            localStorage.setItem("adminProfileImage", imageUrl);
+            localStorage.setItem(user.uid, imageUrl);
             setProfile(prev => ({ ...prev, profileImage: imageUrl }));
             setSuccess("Profile image updated");
             setTimeout(() => setSuccess(""), 1500);
@@ -146,7 +147,7 @@ const AdminDashboard = () => {
 
             if (user.email !== profile.email) {
                 const credential = firebase.auth.EmailAuthProvider.credential(
-                    user.email, 
+                    user.email,
                     profile.currentPassword
                 );
                 await user.reauthenticateWithCredential(credential);
