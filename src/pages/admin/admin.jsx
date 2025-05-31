@@ -18,7 +18,7 @@ const AdminDashboard = () => {
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
-        profileImage: localStorage.getItem(user.uid) || "",
+        profileImage: localStorage.getItem(user ? user.uid : "") || "",
     });
 
     const [errors, setErrors] = useState({});
