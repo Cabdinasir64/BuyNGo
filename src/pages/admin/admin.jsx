@@ -88,9 +88,8 @@ const AdminDashboard = () => {
 
         try {
             await firebase.firestore().collection("users").doc(userId).delete();
-            setUsers(users.filter(user => user.id !== userId));
             setSuccess("User deleted successfully");
-            setTimeout(() => setSuccess(""), 3000);
+            setTimeout(() => setSuccess(""), 1500);
         } catch (error) {
             setErrors({ general: "Failed to delete user" });
         }
