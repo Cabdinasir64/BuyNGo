@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import firebase from '/firebase';
 import { FaTrash, FaPlus, FaImage, FaTimes, FaSpinner } from 'react-icons/fa';
-import PropTypes from 'prop-types';
 
 const categoriesData = [
     {
@@ -15,7 +14,7 @@ const categoriesData = [
     {
         name: "Fashion & Apparel",
         subcategories: [
-            "Men’s Clothing", "Women’s Clothing", "Kids & Baby Clothing",
+            "Men's Clothing", "Women's Clothing", "Kids & Baby Clothing",
             "Shoes & Accessories (bags, watches, jewelry)"
         ]
     },
@@ -46,7 +45,7 @@ const categoriesData = [
     {
         name: "Baby & Kids",
         subcategories: [
-            "Toys & Games", "Baby Gear (strollers, car seats)", "Kids’ Fashion"
+            "Toys & Games", "Baby Gear (strollers, car seats)", "Kids' Fashion"
         ]
     },
     {
@@ -95,20 +94,18 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
     const [product, setProduct] = useState(initialProduct || defaultProductState);
 
     useEffect(() => {
-    if (initialProduct) {
-        setProduct(initialProduct);
-    } else {
-        setProduct(defaultProductState);
-    }
-}, [initialProduct]);
+        if (initialProduct) {
+            setProduct(initialProduct);
+        } else {
+            setProduct(defaultProductState);
+        }
+    }, [initialProduct]);
 
     const [newProperty, setNewProperty] = useState({ key: '', value: '' });
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
-
-    
 
     // Handle image upload 
     const handleImageUpload = async (e, isMainImage = false) => {
@@ -190,7 +187,6 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
         }
     };
 
-
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -220,16 +216,13 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
             };
 
             if (initialProduct) {
-                // Update existing product
                 await firebase.firestore()
                     .collection('products')
                     .doc(initialProduct.id)
                     .update(productData);
 
-                setSuccess('Product updated successfully');
                 if (onSave) onSave(productData);
             } else {
-                // Add new product
                 const user = firebase.auth().currentUser;
                 productData.sellerId = user.uid;
                 productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
@@ -260,6 +253,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
             setLoading(false);
         }
     };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -268,7 +262,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
             transition={{ duration: 0.3 }}
             className="bg-white rounded-lg shadow-xl p-6 md:p-8"
         >
-            <h2 className="text-2xl font-bold text-dark font-heading">
+            <h2 className="text-2xl font-bold text-dark font-heading mb-4">
                 {initialProduct ? 'Edit Product' : 'Add New Product'}
             </h2>
             {onCancel && (
@@ -584,13 +578,12 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
                     </div>
                 </div>
 
-
                 {/* Submit Button */}
                 <div className="pt-6">
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 px-4 bg-primary hover:bg-primary-dark/80 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all duration-150 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center text-lg" /* Adjusted text size */
+                        className="w-full py-3 px-4 bg-primary hover:bg-primary-dark/80 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all duration-150 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center text-lg"
                     >
                         {loading ? (
                             <>
@@ -606,17 +599,4 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
         </motion.div>
     );
 };
-
-AddProduct.propTypes = {
-    initialProduct: PropTypes.object,
-    onSave: PropTypes.func,
-    onCancel: PropTypes.func
-};
-
-AddProduct.defaultProps = {
-    initialProduct: null,
-    onSave: null,
-    onCancel: null
-};
-
 export default AddProduct;
