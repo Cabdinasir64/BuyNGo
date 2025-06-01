@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import firebase from "/firebase";
 import { FaUsers } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
-
+import { motion, AnimatePresence } from "framer-motion";
 const AdminDashboard = () => {
   const user = firebase.auth().currentUser;
   const navigate = useNavigate();
@@ -102,11 +102,11 @@ const AdminDashboard = () => {
     try {
       if (userId === user.uid) {
         setErrors({ general: "Cannot delete your own account" });
+        setTimeout(() => setErrors({}), 3000);
         return;
       }
 
       await firebase.firestore().collection("users").doc(userId).delete();
-      await firebase.auth().currentUser.delete();
       setUsers(users.filter((user) => user.id !== userId));
       setSuccess("User deleted successfully");
       setTimeout(() => setSuccess(""), 3000);
@@ -269,33 +269,42 @@ const AdminDashboard = () => {
         <h1 className="text-xl font-bold text-white font-heading">
           Admin Dashboard
         </h1>
-        <button
+
+        <motion.button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="text-white focus:outline-none"
+          whileTap={{ scale: 0.9 }}
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            {isSidebarOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            )}
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <AnimatePresence mode="wait">
+              {isSidebarOpen ? (
+                <motion.path
+                  key="close-icon"
+                  initial={{ opacity: 0, pathLength: 0 }}
+                  animate={{ opacity: 1, pathLength: 1 }}
+                  exit={{ opacity: 0, pathLength: 0 }}
+                  transition={{ duration: 0.3 }}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <motion.path
+                  key="menu-icon"
+                  initial={{ opacity: 0, pathLength: 0 }}
+                  animate={{ opacity: 1, pathLength: 1 }}
+                  exit={{ opacity: 0, pathLength: 0 }}
+                  transition={{ duration: 0.3 }}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </AnimatePresence>
           </svg>
-        </button>
+        </motion.button>
       </div>
 
       {/* Sidebar */}
@@ -309,32 +318,35 @@ const AdminDashboard = () => {
           </h2>
         </div>
         <nav className="p-4 space-y-2 flex-grow">
-          <button
+          <motion.button
             onClick={() => {
               setActiveTab("users");
               setIsSidebarOpen(false);
             }}
             className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium ${activeTab === "users"
-              ? "bg-primary text-white"
-              : "hover:bg-primary-light hover:text-primary-dark"
-              }`}
+              ? "bg-primary text-white hover:bg-primary/80" : "hover:bg-primary"}`}
+            layout="activeTabIndicator"
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
             <FaUsers className="mr-2 text-2xl hidden md:inline lg:hidden" />
             <span className="inline md:hidden lg:inline">Manage users</span>
-          </button>
-          <button
+          </motion.button>
+
+          <motion.button
             onClick={() => {
               setActiveTab("profile");
               setIsSidebarOpen(false);
             }}
             className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium ${activeTab === "profile"
-              ? "bg-primary text-white"
-              : "hover:bg-primary-light hover:text-primary-dark"
+              ? "bg-primary text-white hover:bg-primary/80"
+              : "hover:bg-primary"
               }`}
+            layout="activeTabIndicator"
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
             <CgProfile className="mr-2 text-2xl hidden md:inline lg:hidden" />
             <span className="inline md:hidden lg:inline">My profile</span>
-          </button>
+          </motion.button>
         </nav>
         <div className="p-4 border-t-2 border-primary">
           <button
@@ -351,7 +363,7 @@ const AdminDashboard = () => {
         {/* Header */}
         <header className="bg-white shadow-sm p-6 sticky top-0 md:top-0 z-10">
           <h1 className="text-2xl font-bold text-dark font-heading">
-            {activeTab === "users" ? "User Management" : "My Profile"}
+            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
           </h1>
         </header>
 
@@ -361,339 +373,375 @@ const AdminDashboard = () => {
           style={{ height: "calc(100vh - 80px)" }}
         >
           {success && (
-            <div className="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-md shadow">
+            <motion.div className="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-md shadow"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}>
               <p className="font-medium">{success}</p>
-            </div>
+            </motion.div>
           )}
           {errors.general && (
-            <div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-md shadow">
+            <motion.div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-md shadow"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}>
               <p className="font-medium">{errors.general}</p>
-            </div>
+            </motion.div>
           )}
-
-          {activeTab === "users" ? (
-            <div className="bg-white rounded-lg shadow-xl p-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-                <h2 className="text-xl font-semibold text-dark font-heading">
-                  All Users ({filteredUsers.length})
-                </h2>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search users by name or email..."
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent w-full md:w-72"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <svg
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          <AnimatePresence mode="wait">
+            {activeTab === "users" ? (
+              <motion.div
+                key="users"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white rounded-lg shadow-xl p-6"
+              >
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+                  <h2 className="text-xl font-semibold text-dark font-heading">
+                    All Users ({filteredUsers.length})
+                  </h2>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search users by name or email..."
+                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent w-full md:w-72"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                  </svg>
+                    <svg
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
                 </div>
-              </div>
 
-              {loading ? (
-                <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-primary-dark"></div>
-                  <p className="ml-4 text-dark-muted">Loading Users...</p>
-                </div>
-              ) : filteredUsers.length === 0 ? (
-                <p className="text-dark-muted text-center py-8">
-                  No users found matching your criteria.
-                </p>
-              ) : (
-                <div className="overflow-x-auto rounded-lg border border-gray-200">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
-                          Email
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
-                          Created At
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
-                          Role
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredUsers.map((user) => (
-                        <tr
-                          key={user.id}
-                          className="hover:bg-gray-100 transition-colors duration-150"
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10 rounded-ful flex items-center justify-center">
-                                {user.profileImage &&
-                                  (user.role === "admin" ||
-                                    user.id !== user.uid ? (
-                                    <img
-                                      src={user.profileImage}
-                                      alt="Profile"
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : null)}
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-dark">
-                                  {user.displayName || user.email.split("@")[0]}
+                {loading ? (
+                  <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-primary-dark"></div>
+                    <p className="ml-4 text-dark-muted">Loading Users...</p>
+                  </div>
+                ) : filteredUsers.length === 0 ? (
+                  <p className="text-dark-muted text-center py-8">
+                    No users found matching your criteria.
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto rounded-lg border border-gray-200">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
+                            Name
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
+                            Email
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
+                            Created At
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
+                            Role
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-dark-muted uppercase tracking-wider">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {filteredUsers.map((user) => (
+                          <motion.tr
+                            key={user.id}
+                            layout
+                            initial={{ opacity: 1, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                            className="hover:bg-gray-100 transition-colors duration-150"
+                          >
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-10 w-10 rounded-ful flex items-center justify-center">
+                                  {user.profileImage &&
+                                    (user.role === "admin" ||
+                                      user.id !== user.uid ? (
+                                      <img
+                                        src={user.profileImage}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : null)}
+                                </div>
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-dark">
+                                    {user.displayName || user.email.split("@")[0]}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-muted">
-                            {user.email}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-muted">
-                            {user.createdAt}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <select
-                              value={user.role || "buyer"}
-                              onChange={(e) =>
-                                handleRoleChange(user.id, e.target.value)
-                              }
-                              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
-                            >
-                              <option value="buyer">Buyer</option>
-                              <option value="seller">Seller</option>
-                              <option value="admin">Admin</option>
-                            </select>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button
-                              onClick={() => handleDeleteUser(user.id)}
-                              className="text-accent-red hover:text-red-700 transition-colors font-semibold"
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          ) : (
-            // Profile Tab
-            <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 max-w-2xl mx-auto">
-              <h2 className="text-xl font-semibold text-dark mb-8 font-heading text-center">
-                Profile Settings
-              </h2>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-muted">
+                              {user.email}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-muted">
+                              {user.createdAt}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <select
+                                value={user.role || "buyer"}
+                                onChange={(e) =>
+                                  handleRoleChange(user.id, e.target.value)
+                                }
+                                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                              >
+                                <option value="buyer">Buyer</option>
+                                <option value="seller">Seller</option>
+                                <option value="admin">Admin</option>
+                              </select>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              <button
+                                onClick={() => handleDeleteUser(user.id)}
+                                className="text-accent-red hover:text-red-700 transition-colors font-semibold"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </motion.div>
+            ) : (
+              // Profile Tab
+              <motion.div
+                key="profile"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white rounded-lg shadow-xl p-6 md:p-8 max-w-2xl mx-auto"
+              >
+                <div className="">
+                  <h2 className="text-xl font-semibold text-dark mb-8 font-heading text-center">
+                    Profile Settings
+                  </h2>
 
-              <form onSubmit={handleProfileUpdate} className="space-y-6">
-                <div className="flex flex-col items-center space-y-4 mb-8">
-                  <div className="relative">
-                    {profile.profileImage ? (
-                      <img
-                        src={profile.profileImage}
-                        alt="Profile"
-                        className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-primary-light shadow-md"
-                      />
-                    ) : (
-                      <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-primary-light border-4 border-primary-light flex items-center justify-center shadow-md">
-                        <span className="text-primary-dark text-4xl md:text-5xl font-bold font-heading">
-                          {(
-                            profile.name?.charAt(0) ||
-                            profile.email?.charAt(0) ||
-                            "A"
-                          ).toUpperCase()}
-                        </span>
+                  <form onSubmit={handleProfileUpdate} className="space-y-6">
+                    <div className="flex flex-col items-center space-y-4 mb-8">
+                      <motion.div className="relative"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}>
+                        {profile.profileImage ? (
+                          <motion.img
+                            src={profile.profileImage}
+                            alt="Profile"
+                            className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-primary-light shadow-md"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                          />
+                        ) : (
+                          <motion.div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-primary-light border-4 border-primary-light flex items-center justify-center shadow-md"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}>
+                            <span className="text-primary-dark text-4xl md:text-5xl font-bold font-heading">
+                              {(
+                                profile.name?.charAt(0) ||
+                                profile.email?.charAt(0) ||
+                                "A"
+                              ).toUpperCase()}
+                            </span>
+                          </motion.div>
+                        )}
+                        <label className="absolute bottom-0 right-0 bg-white rounded-full p-2 border-2 border-primary-light shadow-md cursor-pointer hover:bg-gray-100 transition">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                          <svg
+                            className="w-5 h-5 text-primary"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828zM5 14a1 1 0 11-2 0 1 1 0 012 0zM13 6l-1.414-1.414 2.828-2.828L15.828 3 13 6zM5 16H4a1 1 0 01-1-1V5a1 1 0 011-1h1M15 16h1a1 1 0 001-1V5a1 1 0 00-1-1h-1m-5.071.293a.999.999 0 00-1.414 0l-6.163 6.163A.996.996 0 001 12v2a1 1 0 001 1h2a.996.996 0 00.707-.293l6.163-6.163a.999.999 0 000-1.414z" />
+                          </svg>
+                        </label>
+                      </motion.div>
+                      <div className="text-center">
+                        <h3 className="text-2xl font-bold text-dark font-heading">
+                          {profile.name || "Admin User"}
+                        </h3>
+                        <p className="text-dark-muted">{profile.email}</p>
                       </div>
-                    )}
-                    <label className="absolute bottom-0 right-0 bg-white rounded-full p-2 border-2 border-primary-light shadow-md cursor-pointer hover:bg-gray-100 transition">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                      <svg
-                        className="w-5 h-5 text-primary"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-dark-muted mb-1"
                       >
-                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828zM5 14a1 1 0 11-2 0 1 1 0 012 0zM13 6l-1.414-1.414 2.828-2.828L15.828 3 13 6zM5 16H4a1 1 0 01-1-1V5a1 1 0 011-1h1M15 16h1a1 1 0 001-1V5a1 1 0 00-1-1h-1m-5.071.293a.999.999 0 00-1.414 0l-6.163 6.163A.996.996 0 001 12v2a1 1 0 001 1h2a.996.996 0 00.707-.293l6.163-6.163a.999.999 0 000-1.414z" />
-                      </svg>
-                    </label>
-                  </div>
-                  <div className="text-center">
-                    <h3 className="text-2xl font-bold text-dark font-heading">
-                      {profile.name || "Admin User"}
-                    </h3>
-                    <p className="text-dark-muted">{profile.email}</p>
-                  </div>
-                </div>
+                        Full Name
+                      </label>
+                      <input
+                        id="name"
+                        type="text"
+                        value={profile.name}
+                        onChange={(e) =>
+                          setProfile({ ...profile, name: e.target.value })
+                        }
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.name
+                          ? "border-red-500 focus:ring-red-300"
+                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                          }`}
+                        placeholder="Your full name"
+                      />
+                      {errors.name && (
+                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                      )}
+                    </div>
 
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-dark-muted mb-1"
-                  >
-                    Full Name
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    value={profile.name}
-                    onChange={(e) =>
-                      setProfile({ ...profile, name: e.target.value })
-                    }
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.name
-                      ? "border-red-500 focus:ring-red-300"
-                      : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                      }`}
-                    placeholder="Your full name"
-                  />
-                  {errors.name && (
-                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-dark-muted mb-1"
-                  >
-                    Email Address
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={profile.email}
-                    onChange={(e) =>
-                      setProfile({ ...profile, email: e.target.value })
-                    }
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.email
-                      ? "border-red-500 focus:ring-red-300"
-                      : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                      }`}
-                    placeholder="your.email@example.com"
-                  />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                  )}
-                </div>
-                <hr className="my-6 border-gray-200" />
-                <p className="text-sm text-dark-muted mb-1">
-                  To change email or password, current password is required.
-                </p>
-                <div>
-                  <label
-                    htmlFor="currentPassword"
-                    className="block text-sm font-medium text-dark-muted mb-1"
-                  >
-                    Current Password
-                  </label>
-                  <input
-                    id="currentPassword"
-                    type="password"
-                    value={profile.currentPassword}
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        currentPassword: e.target.value,
-                      })
-                    }
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.currentPassword
-                      ? "border-red-500 focus:ring-red-300"
-                      : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                      }`}
-                    placeholder="Required for email/password changes"
-                  />
-                  {errors.currentPassword && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.currentPassword}
+                    <div>
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-dark-muted mb-1"
+                      >
+                        Email Address
+                      </label>
+                      <input
+                        id="email"
+                        type="email"
+                        value={profile.email}
+                        onChange={(e) =>
+                          setProfile({ ...profile, email: e.target.value })
+                        }
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.email
+                          ? "border-red-500 focus:ring-red-300"
+                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                          }`}
+                        placeholder="your.email@example.com"
+                      />
+                      {errors.email && (
+                        <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                      )}
+                    </div>
+                    <hr className="my-6 border-gray-200" />
+                    <p className="text-sm text-dark-muted mb-1">
+                      To change email or password, current password is required.
                     </p>
-                  )}
-                </div>
+                    <div>
+                      <label
+                        htmlFor="currentPassword"
+                        className="block text-sm font-medium text-dark-muted mb-1"
+                      >
+                        Current Password
+                      </label>
+                      <input
+                        id="currentPassword"
+                        type="password"
+                        value={profile.currentPassword}
+                        onChange={(e) =>
+                          setProfile({
+                            ...profile,
+                            currentPassword: e.target.value,
+                          })
+                        }
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.currentPassword
+                          ? "border-red-500 focus:ring-red-300"
+                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                          }`}
+                        placeholder="Required for email/password changes"
+                      />
+                      {errors.currentPassword && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.currentPassword}
+                        </p>
+                      )}
+                    </div>
 
-                <div>
-                  <label
-                    htmlFor="newPassword"
-                    className="block text-sm font-medium text-dark-muted mb-1"
-                  >
-                    New Password
-                  </label>
-                  <input
-                    id="newPassword"
-                    type="password"
-                    value={profile.newPassword}
-                    onChange={(e) =>
-                      setProfile({ ...profile, newPassword: e.target.value })
-                    }
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.newPassword
-                      ? "border-red-500 focus:ring-red-300"
-                      : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                      }`}
-                    placeholder="new current password"
-                  />
-                  {errors.newPassword && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.newPassword}
-                    </p>
-                  )}
-                </div>
+                    <div>
+                      <label
+                        htmlFor="newPassword"
+                        className="block text-sm font-medium text-dark-muted mb-1"
+                      >
+                        New Password
+                      </label>
+                      <input
+                        id="newPassword"
+                        type="password"
+                        value={profile.newPassword}
+                        onChange={(e) =>
+                          setProfile({ ...profile, newPassword: e.target.value })
+                        }
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.newPassword
+                          ? "border-red-500 focus:ring-red-300"
+                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                          }`}
+                        placeholder="new current password"
+                      />
+                      {errors.newPassword && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.newPassword}
+                        </p>
+                      )}
+                    </div>
 
-                <div>
-                  <label
-                    htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-dark-muted mb-1"
-                  >
-                    Confirm New Password
-                  </label>
-                  <input
-                    id="confirmPassword"
-                    type="password"
-                    value={profile.confirmPassword}
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        confirmPassword: e.target.value,
-                      })
-                    }
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.confirmPassword
-                      ? "border-red-500 focus:ring-red-300"
-                      : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                      }`}
-                    placeholder="Confirm your new password"
-                  />
-                  {errors.confirmPassword && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.confirmPassword}
-                    </p>
-                  )}
-                </div>
+                    <div>
+                      <label
+                        htmlFor="confirmPassword"
+                        className="block text-sm font-medium text-dark-muted mb-1"
+                      >
+                        Confirm New Password
+                      </label>
+                      <input
+                        id="confirmPassword"
+                        type="password"
+                        value={profile.confirmPassword}
+                        onChange={(e) =>
+                          setProfile({
+                            ...profile,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.confirmPassword
+                          ? "border-red-500 focus:ring-red-300"
+                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                          }`}
+                        placeholder="Confirm your new password"
+                      />
+                      {errors.confirmPassword && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.confirmPassword}
+                        </p>
+                      )}
+                    </div>
 
-                <div>
-                  <button
-                    type="submit"
-                    className="w-full py-3 px-4 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-150 ease-in-out"
-                  >
-                    Update Profile
-                  </button>
+                    <div>
+                      <button
+                        type="submit"
+                        className="w-full py-3 px-4 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-150 ease-in-out"
+                      >
+                        Update Profile
+                      </button>
+                    </div>
+                  </form>
                 </div>
-              </form>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
     </div>
