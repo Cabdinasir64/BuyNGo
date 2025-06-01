@@ -95,7 +95,7 @@ const signin = () => {
                     navigate("/AdminDashboard");
                     break;
                 case "seller":
-                    navigate("/");
+                    navigate("/SellerDashboard");
                     break;
                 default:
                     navigate("/");
