@@ -323,13 +323,13 @@ const AdminDashboard = () => {
               setActiveTab("users");
               setIsSidebarOpen(false);
             }}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium ${activeTab === "users"
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium text-nowrap flex items-center ${activeTab === "users"
               ? "bg-primary text-white hover:bg-primary/80" : "hover:bg-primary"}`}
             layout="activeTabIndicator"
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
-            <FaUsers className="mr-2 text-2xl hidden md:inline lg:hidden" />
-            <span className="inline md:hidden lg:inline">Manage users</span>
+            <FaUsers className="mr-2 text-2xl md:inline " />
+            <span className="inline md:hdden lg:inline">Manage users</span>
           </motion.button>
 
           <motion.button
@@ -337,15 +337,15 @@ const AdminDashboard = () => {
               setActiveTab("profile");
               setIsSidebarOpen(false);
             }}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium ${activeTab === "profile"
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium text-nowrap flex items-center ${activeTab === "profile"
               ? "bg-primary text-white hover:bg-primary/80"
               : "hover:bg-primary"
               }`}
             layout="activeTabIndicator"
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
-            <CgProfile className="mr-2 text-2xl hidden md:inline lg:hidden" />
-            <span className="inline md:hidden lg:inline">My profile</span>
+            <CgProfile className="mr-2 text-2xl md:inline " />
+            <span className="inline md:hdden lg:inline">My profile</span>
           </motion.button>
         </nav>
         <div className="p-4 border-t-2 border-primary">
