@@ -337,7 +337,7 @@ const signin = () => {
                             <p>
                                 Don't have an account?{" "}
                                 <Link
-                                    to="/"
+                                    to="/signup"
                                     className="font-medium text-primary-DEFAULT hover:text-primary-dark transition-colors"
                                 >
                                     Sign up
