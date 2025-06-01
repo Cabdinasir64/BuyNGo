@@ -139,7 +139,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      // 2️⃣ Upload to Cloudinary
+      // Upload to Cloudinary
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", "test_test");
