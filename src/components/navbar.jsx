@@ -175,7 +175,7 @@ const Navbar = () => {
         <motion.nav
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white shadow-md sticky top-0 z-50"
+            className="bg-white shadow-md fixed left top-0 z-50 w-full"
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8">
                 <div className="flex justify-between items-center h-16">
@@ -190,7 +190,7 @@ const Navbar = () => {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-8">
+                    <div className="hidden lg:flex items-center space-x-8">
                         <Link to="/" className="text-dark hover:text-primary transition">
                             Home
                         </Link>
