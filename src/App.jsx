@@ -15,12 +15,9 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/SellerDashboard" element={<SellerDashboard />} />
-          <Route
-            path="/category/:categorySlug/:subcategorySlug"
-            element={<Category />}
-          />
-          <Route path="/AdminDashboard" element={<AdminDashboard />} />
+          <Route path="/sellerdashboard" element={<SellerDashboard />} />
+          <Route path="/category/:categorySlug/:subcategorySlug" element={<Category />}/>
+          <Route path="/admindashboard" element={<AdminDashboard />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
         </Routes>
