@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import firebase from "/firebase";
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from "framer-motion";
 import AddToCartButton from "../../../components/addtocart";
 
@@ -7,6 +8,7 @@ function Product() {
     const [products, setProducts] = useState([]);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
@@ -15,7 +17,7 @@ function Product() {
 
         return () => unsubscribe();
     }, []);
-
+ 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -39,6 +41,11 @@ function Product() {
 
         fetchProducts();
     }, []);
+
+    const handleProductClick = (product) => {
+        const slug = product.name.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-');
+        navigate(`/product/${slug}`);
+    };
 
     // Skeleton loading component
     const SkeletonCard = () => (
@@ -94,6 +101,7 @@ function Product() {
                                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
+                                onClick={() => handleProductClick(product)}
                                 whileHover={{ y: -5 }}
                                 transition={{
                                     delay: idx * 0.01,
@@ -183,6 +191,7 @@ function Product() {
                                         damping: 10
                                     }}
                                     layout
+                                    onClick={() => handleProductClick(product)}
                                 >
                                     <div className="relative">
                                         <motion.img
