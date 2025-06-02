@@ -157,7 +157,7 @@ const Navbar = () => {
         try {
             await firebase.auth().signOut();
             setShowUserDropdown(false);
-            navigate('/signin');
+            navigate('/');
         } catch (error) {
             setErrors({ general: "Error signing out.", error });
         }
@@ -246,7 +246,7 @@ const Navbar = () => {
         <motion.nav
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white shadow-md sticky left top-0 z-[999] w-full"
+            className="bg-white shadow-md fixed left top-0 z-[999] w-full"
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8">
                 <div className="flex justify-between items-center h-16">
@@ -256,7 +256,7 @@ const Navbar = () => {
                             to="/"
                             className="text-2xl font-bold text-primary font-heading"
                         >
-                            BuyNGo
+                            Buy<span className='text-dark'>NGo</span>
                         </Link>
                     </div>
                     {/* Desktop Navigation */}
@@ -405,7 +405,7 @@ const Navbar = () => {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className="absolute top-full left-0 right-0 w-full bg-gray-50 shadow-xl border-t border-gray-200 z-40"
+                        className="absolute top-full left-0 right-0 w-full bg-gray-50 shadow-xl border-t border-gray-200 z-50"
                         onMouseEnter={handleMegaMenuMouseEnter}
                         onMouseLeave={handleMegaMenuMouseLeave}
                     >
