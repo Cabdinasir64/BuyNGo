@@ -4,6 +4,7 @@ import firebase from "/firebase";
 import { FaSpinner, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import Navbar from '../components/navbar';
 import AddToCartButton from '../components/addtocart'
+import { useNavigate } from 'react-router-dom'
 
 const generateSlug = (name) => {
     return name.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-');
@@ -16,6 +17,8 @@ const Category = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const navigate = useNavigate();
+
     const productsPerPage = 10;
 
     useEffect(() => {
@@ -61,6 +64,11 @@ const Category = () => {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page);
         }
+    };
+
+    const handleProductClick = (product) => {
+        const slug = product.name.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-');
+        navigate(`/product/${slug}`);
     };
 
     if (loading) return (
@@ -110,7 +118,8 @@ const Category = () => {
                 {/* Products Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
                     {currentProducts.map(product => (
-                        <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+                        <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300"
+                            onClick={() => handleProductClick(product)}>
                             <div className="h-48 bg-gray-200 overflow-hidden">
                                 {product.mainImage ? (
                                     <img
