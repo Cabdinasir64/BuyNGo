@@ -3,8 +3,8 @@ import SignUp from './auth/signup'
 import SignIn from './auth/signin'
 import SellerDashboard from './pages/seller/seller'
 import AdminDashboard from "./pages/admin/admin";
-import Navbar from './components/navbar'
 import Category from './pages/category'
+import Home from './pages/home/home'
 
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<Navbar />} />
+          <Route path="/" element={<Home />} />
           <Route path="/SellerDashboard" element={<SellerDashboard />} />
           <Route
             path="/category/:categorySlug/:subcategorySlug"
