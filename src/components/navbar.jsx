@@ -90,7 +90,6 @@ const Navbar = () => {
     const [activeMobileCategoryIndex, setActiveMobileCategoryIndex] = useState(null);
     const [user, setUser] = useState(null);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
-    const userDropdownRef = useRef(null);
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
     const navigate = useNavigate();
@@ -304,7 +303,7 @@ const Navbar = () => {
                             />
                             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         </div>
-                        <div className="relative" ref={userDropdownRef}>
+                        <div className="relative">
                             <button
                                 onClick={() => setShowUserDropdown(!showUserDropdown)}
                                 className="flex items-center text-dark hover:text-primary transition"
@@ -319,7 +318,7 @@ const Navbar = () => {
                                             />
                                         ) : (
                                             <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
-                                                {user ? user.email.charAt(0).toUpperCase() : 'U'}
+                                                {user.email.charAt(0).toUpperCase() || 'U'}
                                             </div>
                                         )}
                                     </>
@@ -347,7 +346,7 @@ const Navbar = () => {
                                                     </p>
                                                 </div>
                                                 <Link
-                                                    to="/dashboard"
+                                                    to="/buyerdashboard"
                                                     className="block px-4 py-2 text-sm text-dark hover:bg-gray-100"
                                                     onClick={() => setShowUserDropdown(false)}
                                                 >
@@ -488,7 +487,7 @@ const Navbar = () => {
                                 Home
                             </Link>
 
-                            {/* Mobile Categories Section Toggle + Accordion */}
+                            {/* Mobile Categories*/}
                             <div>
                                 <button
                                     onClick={toggleShowMobileCategoriesList}
@@ -550,7 +549,7 @@ const Navbar = () => {
                                                                                 category.name
                                                                             )}/${generateSlug(sub)}`}
                                                                             className="block px-3 py-2 text-xs text-dark-muted hover:text-primary hover:bg-gray-100 rounded-md"
-                                                                            onClick={closeMegaMenuAndMobile} // Closes main mobile menu
+                                                                            onClick={closeMegaMenuAndMobile}
                                                                         >
                                                                             {sub}
                                                                         </Link>
@@ -604,7 +603,7 @@ const Navbar = () => {
                                                         />
                                                     ) : (
                                                         <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
-                                                            {user ? user.email.charAt(0).toUpperCase() : 'U'}
+                                                            {user.email.charAt(0).toUpperCase() || 'U'}
                                                         </div>
                                                     )}
                                                     <span className="text-sm font-medium">{user.displayName || 'User'}</span>
