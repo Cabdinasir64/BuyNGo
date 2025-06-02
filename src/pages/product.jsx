@@ -23,8 +23,6 @@ const Product = () => {
     const [reviews, setReviews] = useState([]);
     const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
     const [seller, setSeller] = useState(null);
-    const [sellerProducts, setSellerProducts] = useState([]);
-
     // Calculate average rating
     const averageRating = reviews.length > 0
         ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
@@ -60,15 +58,8 @@ const Product = () => {
                         const sellerDoc = await firebase.firestore().collection('users').doc(foundProduct.sellerId).get();
                         if (sellerDoc.exists) {
                             setSeller(sellerDoc.data());
-
-                            // Fetch seller's other products
-                            const sellerProducts = productsData
-                                .filter(p => p.sellerId === foundProduct.sellerId && p.id !== foundProduct.id)
-                                .slice(0, 8);
-                            setSellerProducts(sellerProducts);
                         }
                     }
-
                     // Fetch related products
                     const related = productsData
                         .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
