@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import firebase from '/firebase';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+import { FaSpinner, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import Navbar from '../components/navbar';
 
 const generateSlug = (name) => {
     return name.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-');
 };
 
-const CategoryProducts = () => {
+const Category = () => {
     const { categorySlug, subcategorySlug } = useParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 20;
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -24,15 +29,15 @@ const CategoryProducts = () => {
                     ...doc.data()
                 }));
 
-                // Filter products by category and subcategory slug (no slug in Firestore)
-                const filteredProducts = productsData.filter(product =>
+                // Filter products by category and subcategory slug
+                const filtered = productsData.filter(product =>
                     generateSlug(product.category) === subcategorySlug
                 );
 
-                setProducts(filteredProducts);
-                console.log(filteredProducts);
+                setProducts(filtered);
             } catch (err) {
-                setError('Failed to load products');
+                console.error("Error fetching products:", err);
+                setError('Failed to load products. Please try again later.');
             } finally {
                 setLoading(false);
             }
@@ -41,23 +46,125 @@ const CategoryProducts = () => {
         fetchProducts();
     }, [categorySlug, subcategorySlug]);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
-    if (products.length === 0) return <p>No products found for this category.</p>;
+    // Calculate pagination values
+    const totalPages = Math.ceil(products.length / productsPerPage);
+    const startIndex = (currentPage - 1) * productsPerPage;
+    const currentProducts = products.slice(startIndex, startIndex + productsPerPage);
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+    if (loading) return (
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            <Navbar />
+            <div className="flex-grow flex items-center justify-center">
+                <FaSpinner className="animate-spin text-4xl text-primary" />
+            </div>
+        </div>
+    );
+
+    if (error) return (
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            <Navbar />
+            <div className="flex-grow flex items-center justify-center">
+                <p className="text-red-500 text-xl">{error}</p>
+            </div>
+        </div>
+    );
+
+    if (products.length === 0) return (
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            <Navbar />
+            <div className="flex-grow flex flex-col items-center justify-center p-4">
+                <h2 className="text-2xl font-heading text-dark mb-4">No products found</h2>
+                <p className="text-dark-muted mb-6">
+                    No products found in this category.
+                </p>
+            </div>
+        </div>
+    );
 
     return (
-        <div>
-            <h2>Products in {categorySlug} / {subcategorySlug}</h2>
-            <div className="grid grid-cols-3 gap-4">
-                {products.map(product => (
-                    <div key={product.id} className="border p-4 rounded">
-                        <h3>{product.name}</h3>
-                        <p>${product.price}</p>
+        <div className="min-h-screen bg-gray-50 flex flex-col mt-16">
+            <Navbar />
+            <main className="flex-grow container mx-auto px-4 py-8">
+                {/* Category Header */}
+                <div className="mb-8 text-center">
+                    <h1 className="text-3xl md:text-4xl font-heading font-bold text-dark capitalize">
+                        {subcategorySlug.replace(/-/g, ' ')}
+                    </h1>
+                    <p className="text-dark-muted mt-2">
+                        Showing {currentProducts.length} of {products.length} products
+                    </p>
+                </div>
+
+                {/* Products Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+                    {currentProducts.map(product => (
+                        <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+                            <div className="h-48 bg-gray-200 overflow-hidden">
+                                {product.mainImage ? (
+                                    <img
+                                        src={product.mainImage}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                                        <span className="text-dark-muted">No Image</span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="p-4">
+                                <h3 className="font-semibold text-lg text-dark mb-1 truncate">{product.name}</h3>
+                                <p className="text-primary font-bold text-xl mb-2">${product.price}</p>
+                                <p className="text-dark-muted text-sm mb-3 line-clamp-2">{product.description}</p>
+                                <button className="w-full py-2 bg-secondary text-white rounded hover:bg-secondary-dark transition">
+                                    Add to cart
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {totalPages > 1 && (
+                    <div className="flex justify-center items-center gap-2 mt-8">
+                        <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                        >
+                            <FaArrowLeft />
+                        </button>
+
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => handlePageChange(i + 1)}
+                                className={`px-4 py-2 rounded-full text-sm font-medium ${currentPage === i + 1
+                                    ? 'bg-primary text-white'
+                                    : 'bg-gray-100 hover:bg-gray-200'
+                                    }`}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+
+                        <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                        >
+                            <FaArrowRight />
+                        </button>
                     </div>
-                ))}
-            </div>
+                )}
+            </main>
         </div>
     );
 };
 
-export default CategoryProducts;
+export default Category;
