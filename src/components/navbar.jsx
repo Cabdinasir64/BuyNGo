@@ -94,6 +94,8 @@ const Navbar = () => {
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({});
+    const [success, setSuccess] = useState("");
 
     useEffect(() => {
         const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
@@ -116,11 +118,10 @@ const Navbar = () => {
                 .onSnapshot((doc) => {
                     if (doc.exists) {
                         const cartData = doc.data();
-                        setCartItems(cartData.items || []);
-                        const total = cartData.items.reduce(
-                            (sum, item) => sum + item.quantity, 0
-                        );
-                        setCartTotal(total);
+                        const items = cartData.items || [];
+                        setCartItems(items);
+                        const totalItems = items.reduce((total, item) => total + item.quantity, 0);
+                        setCartTotal(totalItems);
                     } else {
                         setCartItems([]);
                         setCartTotal(0);
@@ -137,19 +138,19 @@ const Navbar = () => {
     const fetchCartItems = async (userId) => {
         try {
             const cartRef = firebase.firestore().collection('carts').doc(userId);
-            const doc = await cartRef.get();   
+            const doc = await cartRef.get();
             if (doc.exists) {
                 const cartData = doc.data();
                 const items = cartData.items || [];
-                setCartItems(items);             
+                setCartItems(items);
                 const totalItems = items.reduce((total, item) => total + item.quantity, 0);
-                setCartTotal(totalItems);        
+                setCartTotal(totalItems);
             } else {
                 setCartItems([]);
                 setCartTotal(0);
             }
         } catch (error) {
-            console.error("Error fetching cart items:", error);
+            setErrors({ general: "Error fetching cart items.", error });
         }
     };
 
@@ -159,7 +160,7 @@ const Navbar = () => {
             setShowUserDropdown(false);
             navigate('/signin');
         } catch (error) {
-            console.error("Error signing out:", error);
+            setErrors({ general: "Error signing out.", error });
         }
     };
 
@@ -191,6 +192,7 @@ const Navbar = () => {
     const handleDesktopCategoriesMouseEnter = () => {
         clearTimeout(megaMenuTimeoutRef.current);
         setIsMegaMenuOpen(true);
+        setSuccess("open")
     };
 
     const handleDesktopCategoriesMouseLeave = () => {
@@ -262,7 +264,6 @@ const Navbar = () => {
                             BuyNGo
                         </Link>
                     </div>
-
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center space-x-8">
                         <Link to="/" className="text-dark hover:text-primary transition">
@@ -451,6 +452,27 @@ const Navbar = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {success && (
+                <motion.div
+                    className="mb-4 p-3 bg-green-100 text-green-700 rounded-md border border-green-300 absolute top-[90px] z-40 left-[30px]"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                >
+                    {success}
+                </motion.div>
+            )}
+            {errors.general && (
+                <motion.div
+                    className="mb-4 p-3 bg-red-100 text-red-700 rounded-md border border-red-300 absolute top-[90px] z-40 left-[30px]"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                >
+                    {errors.general}
+                </motion.div>
+            )}
 
             {/* Mobile Menu */}
             <AnimatePresence>
