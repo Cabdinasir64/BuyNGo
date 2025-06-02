@@ -34,9 +34,9 @@ function AddToCartButton({ product, user, className }) {
             } else {
                 const cartData = cartDoc.data();
                 let items = cartData.items || [];
-                const index = items.findIndex((item) => item.productId === product.id);
+                const itemExist = items.findIndex((item) => item.productId === product.id);
 
-                if (index > -1) {
+                if (itemExist > -1) {
                     items[index].quantity += 1;
                 } else {
                     items.push({
