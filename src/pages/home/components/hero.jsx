@@ -85,8 +85,6 @@ const Hero = () => {
                                 className="absolute inset-0 bg-cover bg-center"
                                 style={{ backgroundImage: `url(${slide.image})` }}
                             />
-
-                            {/* Gradient Overlay */}
                             <div className="absolute inset-0 bg-gradient-to-t from-dark/70 to-transparent" />
 
                             {/* Vertical Progress Bar */}
@@ -96,7 +94,6 @@ const Hero = () => {
                                     style={{ height: `${progress}%` }}
                                 />
                             </div>
-
                             {/* Content */}
                             <div className={`relative z-10 h-full flex flex-col justify-end ${textAlignments[slide.textPosition]} ${slide.padding}`}>
                                 <motion.div
