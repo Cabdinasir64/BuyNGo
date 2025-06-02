@@ -137,11 +137,16 @@ const Navbar = () => {
     const fetchCartItems = async (userId) => {
         try {
             const cartRef = firebase.firestore().collection('carts').doc(userId);
-            const doc = await cartRef.get();
+            const doc = await cartRef.get();   
             if (doc.exists) {
                 const cartData = doc.data();
-                const totalItems = cartData.items.reduce((total, item) => total + item.quantity, 0);
-                setCartItems(totalItems);
+                const items = cartData.items || [];
+                setCartItems(items);             
+                const totalItems = items.reduce((total, item) => total + item.quantity, 0);
+                setCartTotal(totalItems);        
+            } else {
+                setCartItems([]);
+                setCartTotal(0);
             }
         } catch (error) {
             console.error("Error fetching cart items:", error);
