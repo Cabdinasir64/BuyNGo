@@ -190,14 +190,6 @@ const Product = () => {
                             className="bg-blue-50 p-4 rounded-lg"
                         >
                             <p className="text-primary font-bold text-3xl mb-1">${product.price}</p>
-                            {product.originalPrice && (
-                                <p className="text-gray-500 line-through">${product.originalPrice}</p>
-                            )}
-                            {product.discount && (
-                                <span className="bg-red-100 text-red-800 text-sm font-medium ml-2 px-2.5 py-0.5 rounded">
-                                    {product.discount}% OFF
-                                </span>
-                            )}
                         </motion.div>
 
                         <motion.div
