@@ -212,7 +212,7 @@ const Navbar = () => {
     }
 
     const containerVariants = {
-        hidden: { opacity: 0, y: -25, height: 0 },
+        hidden: { opacity: 0, y: -15, height: 0 },
         visible: {
             opacity: 1,
             y: 0,
@@ -225,7 +225,7 @@ const Navbar = () => {
         },
         exit: {
             opacity: 0,
-            y: -25,
+            y: -15,
             height: 0,
         },
     };
@@ -246,7 +246,7 @@ const Navbar = () => {
         <motion.nav
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white shadow-md fixed left top-0 z-50 w-full"
+            className="bg-white shadow-md sticky left top-0 z-[999] w-full"
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8">
                 <div className="flex justify-between items-center h-16">
