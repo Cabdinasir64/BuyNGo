@@ -176,13 +176,10 @@ const Navbar = () => {
 
     const toggleShowMobileCategoriesList = () => {
         setShowMobileCategoriesList(!showMobileCategoriesList);
-        if (showMobileCategoriesList) {
-            setActiveMobileCategoryIndex(null);
-        }
     };
 
     const toggleMobileCategoryAccordion = (index) => {
-        setActiveMobileCategoryIndex(activeMobileCategoryIndex === index ? null : index);
+        setActiveMobileCategoryIndex(activeMobileCategoryIndex !== index ? index : null);
     };
 
     const generateSlug = (name) => {
@@ -192,7 +189,6 @@ const Navbar = () => {
     const handleDesktopCategoriesMouseEnter = () => {
         clearTimeout(megaMenuTimeoutRef.current);
         setIsMegaMenuOpen(true);
-        setSuccess("open")
     };
 
     const handleDesktopCategoriesMouseLeave = () => {
