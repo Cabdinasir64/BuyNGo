@@ -22,7 +22,7 @@ const heroSlides = [
         buttonText: 'DISCOVER DEALS',
         textPosition: 'center',
         bgOverlay: 'bg-secondary/20',
-        padding: 'pb-24 md:pb-40 px-6 md:px-12' 
+        padding: 'pb-24 md:pb-40 px-6 md:px-12'
     },
     {
         image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80',
@@ -31,7 +31,7 @@ const heroSlides = [
         buttonText: 'EXPLORE',
         textPosition: 'left',
         bgOverlay: 'bg-accent-red/20',
-        padding: 'pb-40 md:pb-48 pl-4 md:pl-10' 
+        padding: 'pb-40 md:pb-48 pl-4 md:pl-10'
     }
 ];
 
