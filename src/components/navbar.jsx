@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaUser, FaShoppingCart, FaBars, FaTimes } from 'react-icons/fa';
+import { FaSearch, FaUser, FaShoppingCart, FaBars, FaTimes, FaSignOutAlt } from 'react-icons/fa';
 import { MdOutlineArrowDropDown } from "react-icons/md";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import firebase from '/firebase'
 
 const categoriesData = [
     {
@@ -87,7 +88,75 @@ const Navbar = () => {
     const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
     const [showMobileCategoriesList, setShowMobileCategoriesList] = useState(false);
     const [activeMobileCategoryIndex, setActiveMobileCategoryIndex] = useState(null);
-    const [cartItems, setCartItems] = useState(0);
+    const [user, setUser] = useState(null);
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
+    const userDropdownRef = useRef(null);
+    const [cartItems, setCartItems] = useState([]);
+    const [cartTotal, setCartTotal] = useState(0);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                setUser(user);
+                fetchCartItems(user.uid);
+            } else {
+                setUser(null);
+                setCartItems(0);
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+
+    useEffect(() => {
+        if (user) {
+            const unsubscribe = firebase.firestore()
+                .collection('carts')
+                .doc(user.uid)
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const cartData = doc.data();
+                        setCartItems(cartData.items || []);
+                        const total = cartData.items.reduce(
+                            (sum, item) => sum + item.quantity, 0
+                        );
+                        setCartTotal(total);
+                    } else {
+                        setCartItems([]);
+                        setCartTotal(0);
+                    }
+                });
+
+            return () => unsubscribe();
+        } else {
+            setCartItems([]);
+            setCartTotal(0);
+        }
+    }, [user]);
+
+    const fetchCartItems = async (userId) => {
+        try {
+            const cartRef = firebase.firestore().collection('carts').doc(userId);
+            const doc = await cartRef.get();
+            if (doc.exists) {
+                const cartData = doc.data();
+                const totalItems = cartData.items.reduce((total, item) => total + item.quantity, 0);
+                setCartItems(totalItems);
+            }
+        } catch (error) {
+            console.error("Error fetching cart items:", error);
+        }
+    };
+
+    const handleSignOut = async () => {
+        try {
+            await firebase.auth().signOut();
+            setShowUserDropdown(false);
+            navigate('/signin');
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
+    };
 
     const megaMenuTimeoutRef = useRef(null);
 
@@ -233,24 +302,84 @@ const Navbar = () => {
                             />
                             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         </div>
-                        <Link
-                            to="/signin"
-                            className="text-dark hover:text-primary transition"
-                        >
-                            <FaUser size={18} />
-                        </Link>
-                        <Link
-                            to="/cart"
-                            className="relative text-dark hover:text-primary transition"
-                        >
+                        <div className="relative" ref={userDropdownRef}>
+                            <button
+                                onClick={() => setShowUserDropdown(!showUserDropdown)}
+                                className="flex items-center text-dark hover:text-primary transition"
+                            >
+                                {user ? (
+                                    <>
+                                        {user.profileImage ? (
+                                            <img
+                                                src={user.profileImage}
+                                                alt="User"
+                                                className="w-8 h-8 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+                                                {user ? user.email.charAt(0).toUpperCase() : 'U'}
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <FaUser size={18} />
+                                )}
+                            </button>
+
+                            <AnimatePresence>
+                                {showUserDropdown && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+                                    >
+                                        {user ? (
+                                            <>
+                                                <div className="px-4 py-2 border-b border-gray-100">
+                                                    <p className="text-sm font-medium text-dark truncate">
+                                                        {user.displayName || 'User'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 truncate">
+                                                        {user.email}
+                                                    </p>
+                                                </div>
+                                                <Link
+                                                    to="/dashboard"
+                                                    className="block px-4 py-2 text-sm text-dark hover:bg-gray-100"
+                                                    onClick={() => setShowUserDropdown(false)}
+                                                >
+                                                    Dashboard
+                                                </Link>
+                                                <button
+                                                    onClick={handleSignOut}
+                                                    className="w-full text-left px-4 py-2 text-sm text-dark hover:bg-gray-100 flex items-center"
+                                                >
+                                                    <FaSignOutAlt className="mr-2" /> Logout
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <Link
+                                                to="/signin"
+                                                className="block px-4 py-2 text-sm text-dark hover:bg-gray-100"
+                                                onClick={() => setShowUserDropdown(false)}
+                                            >
+                                                Sign In
+                                            </Link>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                        <Link to="/cart" className="relative text-dark hover:text-primary transition">
                             <FaShoppingCart size={20} />
-                            {cartItems > 0 && (
+                            {cartTotal > 0 && (
                                 <motion.span
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     className="absolute -top-2 -right-2 bg-accent-red text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
                                 >
-                                    {cartItems}
+                                    {cartTotal}
                                 </motion.span>
                             )}
                         </Link>
@@ -440,22 +569,58 @@ const Navbar = () => {
                                     <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 </div>
                                 <div className="flex justify-around mt-4 px-2">
-                                    <Link
-                                        to="/signin"
-                                        className="text-dark hover:text-primary flex flex-col items-center"
-                                        onClick={toggleMenu}
-                                    >
-                                        <FaUser size={18} className="mb-1" /> Login
-                                    </Link>
+                                    <div className='flex items-center'>
+                                        {user ? (
+                                            <div className="flex flex-col items-center space-y-2 w-full">
+                                                <div className="flex items-center space-x-2">
+                                                    {user.profileImage ? (
+                                                        <img
+                                                            src={user.profileImage}
+                                                            alt="User"
+                                                            className="w-8 h-8 rounded-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+                                                            {user ? user.email.charAt(0).toUpperCase() : 'U'}
+                                                        </div>
+                                                    )}
+                                                    <span className="text-sm font-medium">{user.displayName || 'User'}</span>
+                                                </div>
+                                                <div className="flex space-x-4 w-full justify-center">
+                                                    <Link
+                                                        to="/dashboard"
+                                                        className="text-sm text-dark hover:text-primary"
+                                                        onClick={toggleMenu}
+                                                    >
+                                                        Dashboard
+                                                    </Link>
+                                                    <button
+                                                        onClick={handleSignOut}
+                                                        className="text-sm text-dark hover:text-primary flex items-center"
+                                                    >
+                                                        <FaSignOutAlt className="mr-1" /> Logout
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <Link
+                                                to="/signin"
+                                                className="text-dark hover:text-primary flex flex-col items-center"
+                                                onClick={toggleMenu}
+                                            >
+                                                <FaUser size={18} className="mb-1" /> Signin
+                                            </Link>
+                                        )}
+                                    </div>
                                     <Link
                                         to="/cart"
                                         className="relative text-dark hover:text-primary flex flex-col items-center"
                                         onClick={toggleMenu}
                                     >
                                         <FaShoppingCart size={20} className="mb-1" /> Cart
-                                        {cartItems > 0 && (
+                                        {cartTotal > 0 && (
                                             <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-accent-red text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                                {cartItems}
+                                                {cartTotal}
                                             </span>
                                         )}
                                     </Link>
