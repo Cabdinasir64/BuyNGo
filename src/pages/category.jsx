@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
+import firebase from '/firebase'
 import { FaSpinner, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import Navbar from '../components/navbar';
 
@@ -15,7 +14,7 @@ const Category = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 20;
+    const productsPerPage = 10;
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -29,14 +28,12 @@ const Category = () => {
                     ...doc.data()
                 }));
 
-                // Filter products by category and subcategory slug
                 const filtered = productsData.filter(product =>
                     generateSlug(product.category) === subcategorySlug
                 );
 
                 setProducts(filtered);
             } catch (err) {
-                console.error("Error fetching products:", err);
                 setError('Failed to load products. Please try again later.');
             } finally {
                 setLoading(false);
@@ -44,9 +41,8 @@ const Category = () => {
         };
 
         fetchProducts();
-    }, [categorySlug, subcategorySlug]);
+    }, [subcategorySlug]);
 
-    // Calculate pagination values
     const totalPages = Math.ceil(products.length / productsPerPage);
     const startIndex = (currentPage - 1) * productsPerPage;
     const currentProducts = products.slice(startIndex, startIndex + productsPerPage);
@@ -130,7 +126,7 @@ const Category = () => {
                     ))}
                 </div>
 
-                {totalPages > 1 && (
+                {totalPages > 0 && (
                     <div className="flex justify-center items-center gap-2 mt-8">
                         <button
                             onClick={() => handlePageChange(currentPage - 1)}
