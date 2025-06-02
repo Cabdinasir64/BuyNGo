@@ -92,10 +92,10 @@ const signin = () => {
             // Redirect based on role
             switch (userData.role) {
                 case "admin":
-                    navigate("/AdminDashboard");
+                    navigate("/admindashboard");
                     break;
                 case "seller":
-                    navigate("/SellerDashboard");
+                    navigate("/sellerdashboard");
                     break;
                 default:
                     navigate("/");
