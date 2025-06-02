@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import firebase from '/firebase'
+import firebase from "/firebase";
 import { FaSpinner, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import Navbar from '../components/navbar';
+import AddToCartButton from '../components/addtocart'
 
 const generateSlug = (name) => {
     return name.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-');
 };
 
 const Category = () => {
+    const [user, setUser] = useState(null);
     const { categorySlug, subcategorySlug } = useParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -43,6 +45,14 @@ const Category = () => {
         fetchProducts();
     }, [subcategorySlug]);
 
+    useEffect(() => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
+            setUser(firebaseUser);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
     const totalPages = Math.ceil(products.length / productsPerPage);
     const startIndex = (currentPage - 1) * productsPerPage;
     const currentProducts = products.slice(startIndex, startIndex + productsPerPage);
@@ -66,7 +76,7 @@ const Category = () => {
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <Navbar />
             <div className="flex-grow flex items-center justify-center">
-                <p className="text-red-500 text-xl">{error}</p>
+                <p className="text-accent-red text-xl">{error}</p>
             </div>
         </div>
     );
@@ -118,9 +128,11 @@ const Category = () => {
                                 <h3 className="font-semibold text-lg text-dark mb-1 truncate">{product.name}</h3>
                                 <p className="text-primary font-bold text-xl mb-2">${product.price}</p>
                                 <p className="text-dark-muted text-sm mb-3 line-clamp-2">{product.description}</p>
-                                <button className="w-full py-2 bg-secondary text-white rounded hover:bg-secondary-dark transition">
-                                    Add to cart
-                                </button>
+                                <AddToCartButton
+                                    product={product}
+                                    user={user}
+                                    className="w-full py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition flex items-center justify-center gap-2"
+                                />
                             </div>
                         </div>
                     ))}
