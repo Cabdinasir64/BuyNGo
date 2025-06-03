@@ -80,7 +80,7 @@ const categoriesData = [
     }
 ];
 
-const AddProduct = ({ initialProduct, onSave, onCancel }) => {
+const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
     const defaultProductState = {
         name: '',
         price: '',
@@ -113,7 +113,6 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
         if (!files || files.length === 0) return;
 
         try {
-            setLoading(true);
             const uploadedImages = [];
 
             for (let i = 0; i < files.length; i++) {
@@ -146,13 +145,10 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
                     images: [...prev.images, ...uploadedImages].slice(0, 5)
                 }));
             }
-            setSuccess('Images uploaded successfully');
-            setTimeout(() => setSuccess(''), 3000);
         } catch (error) {
-            console.error("Image upload error:", error);
-            setErrors({ general: `Failed to upload images: ${error.message}` });
-        } finally {
-            setLoading(false);
+            setTimeout(() => {
+                setErrors({ general: `Failed to upload images: ${error.message}` });
+            }, 3000)
         }
     };
 
@@ -216,39 +212,75 @@ const AddProduct = ({ initialProduct, onSave, onCancel }) => {
             };
 
             if (initialProduct) {
-                await firebase.firestore()
+                const duplicateCheck = await firebase.firestore()
                     .collection('products')
+                    .where('name', '==', productData.name)
+                    .where('category', '==', productData.category)
+                    .get();
+
+
+                if (!duplicateCheck.empty) {
+                    setErrors("A similar product already exists.");
+                    setTimeout(() => setErrors(""), 3000);
+                    return;
+                }
+                await firebase
+                    .firestore()
+                    .collection("products")
                     .doc(initialProduct.id)
                     .update(productData);
-
                 if (onSave) onSave(productData);
+
+
             } else {
                 const user = firebase.auth().currentUser;
                 productData.sellerId = user.uid;
                 productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-
-                await firebase.firestore()
+                const duplicateCheck = await firebase.firestore()
                     .collection('products')
-                    .add(productData);
+                    .where('sellerId', '==', user.uid)
+                    .where('name', '==', productData.name)
+                    .where('category', '==', productData.category)
+                    .get();
 
-                setSuccess('Product added successfully');
-                setProduct({
-                    name: '',
-                    price: '',
-                    description: '',
-                    category: '',
-                    mainImage: '',
-                    images: [],
-                    properties: []
-                });
+                if (!duplicateCheck.empty) {
+                    setErrors({ general: 'This product already exists.' });
+                    setTimeout(() => setErrors(''), 3000);
+                    return;
+                } else {
+                    await firebase.firestore()
+                        .collection('products')
+                        .add(productData);
+
+                    setSuccess('Product added successfully');
+
+                    setTimeout(() => {
+                        setSuccess('');
+                        if (onSuccess) onSuccess()
+                    }, 3000)
+                    setProduct({
+                        name: '',
+                        price: '',
+                        description: '',
+                        category: '',
+                        mainImage: '',
+                        images: [],
+                        properties: []
+                    });
+                }
             }
         } catch (error) {
-            console.error("Error saving product:", error);
+            setErrors({ general: "Error saving product" });
             setErrors({
                 general: initialProduct ?
                     'Failed to update product' :
                     'Failed to add product'
             });
+            console.log(error);
+            setTimeout(() => {
+                setErrors({});
+            }, 3000)
+
         } finally {
             setLoading(false);
         }
