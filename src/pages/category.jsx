@@ -5,14 +5,12 @@ import { FaSpinner, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import Navbar from '../components/navbar';
 import AddToCartButton from '../components/addtocart'
 import { useNavigate } from 'react-router-dom'
+import Footer from '../components/footer'
 
-const generateSlug = (name) => {
-    return name.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-');
-};
 
 const Category = () => {
     const [user, setUser] = useState(null);
-    const { categorySlug, subcategorySlug } = useParams();
+    const { subcategorySlug } = useParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -71,6 +69,10 @@ const Category = () => {
         navigate(`/product/${slug}`);
     };
 
+    const generateSlug = (name) => {
+        return name.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-');
+    };
+
     if (loading) return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <Navbar />
@@ -108,7 +110,7 @@ const Category = () => {
                 {/* Category Header */}
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl md:text-4xl font-heading font-bold text-dark capitalize">
-                        {subcategorySlug.replace(/-/g, ' ')}
+                        {subcategorySlug.replace(/-/g, " ")}
                     </h1>
                     <p className="text-dark-muted mt-2">
                         Showing {currentProducts.length} of {products.length} products
@@ -117,8 +119,10 @@ const Category = () => {
 
                 {/* Products Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
-                    {currentProducts.map(product => (
-                        <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300"
+                    {currentProducts.map((product) => (
+                        <div
+                            key={product.id}
+                            className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300"
                         >
                             <div className="h-48 bg-gray-200 overflow-hidden">
                                 {product.mainImage ? (
@@ -135,9 +139,15 @@ const Category = () => {
                                 )}
                             </div>
                             <div className="p-4">
-                                <h3 className="font-semibold text-lg text-dark mb-1 truncate">{product.name}</h3>
-                                <p className="text-primary font-bold text-xl mb-2">${product.price}</p>
-                                <p className="text-dark-muted text-sm mb-3 line-clamp-2">{product.description}</p>
+                                <h3 className="font-semibold text-lg text-dark mb-1 truncate">
+                                    {product.name}
+                                </h3>
+                                <p className="text-primary font-bold text-xl mb-2">
+                                    ${product.price}
+                                </p>
+                                <p className="text-dark-muted text-sm mb-3 line-clamp-2">
+                                    {product.description}
+                                </p>
                                 <AddToCartButton
                                     product={product}
                                     user={user}
@@ -149,7 +159,7 @@ const Category = () => {
                 </div>
 
                 {totalPages > 0 && (
-                    <div className="flex justify-center items-center gap-2 mt-8">
+                    <div className="flex justify-center items-center gap-2 mt-8 pb-24">
                         <button
                             onClick={() => handlePageChange(currentPage - 1)}
                             disabled={currentPage === 1}
@@ -163,8 +173,8 @@ const Category = () => {
                                 key={i}
                                 onClick={() => handlePageChange(i + 1)}
                                 className={`px-4 py-2 rounded-full text-sm font-medium ${currentPage === i + 1
-                                    ? 'bg-primary text-white'
-                                    : 'bg-gray-100 hover:bg-gray-200'
+                                    ? "bg-primary text-white"
+                                    : "bg-gray-100 hover:bg-gray-200"
                                     }`}
                             >
                                 {i + 1}
@@ -181,6 +191,7 @@ const Category = () => {
                     </div>
                 )}
             </main>
+            <Footer />
         </div>
     );
 };
