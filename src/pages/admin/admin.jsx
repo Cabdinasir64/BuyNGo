@@ -12,8 +12,6 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Profile state
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -22,11 +20,8 @@ const AdminDashboard = () => {
     confirmPassword: "",
     profileImage: "",
   });
-
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState("");
-
-  // Fetch users from Firestore
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -35,13 +30,11 @@ const AdminDashboard = () => {
           .collection("users")
           .orderBy("createdAt", "desc")
           .get();
-
         const usersData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate().toLocaleString() || "N/A",
         }));
-
         setUsers(usersData);
       } catch (error) {
         setErrors({ general: "Failed to load users" });
@@ -49,11 +42,8 @@ const AdminDashboard = () => {
         setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
-
-  // Load current user profile
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
@@ -63,7 +53,6 @@ const AdminDashboard = () => {
           .doc(user.uid)
           .get();
         const userData = userDoc.exists ? userDoc.data() : {};
-
         setProfile((prev) => ({
           ...prev,
           name: user.displayName || "",
@@ -74,38 +63,30 @@ const AdminDashboard = () => {
     });
     return () => unsubscribe();
   }, []);
-
-  // Handle role change
   const handleRoleChange = async (userId, newRole) => {
     try {
       await firebase.firestore().collection("users").doc(userId).update({
         role: newRole,
       });
-
       setUsers(
         users.map((user) =>
           user.id === userId ? { ...user, role: newRole } : user
         )
       );
-
       setSuccess(`User role updated to ${newRole}`);
       setTimeout(() => setSuccess(""), 3000);
     } catch (error) {
       setErrors({ general: "Failed to update user role" });
     }
   };
-
-  // Handle user deletion
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
-
     try {
       if (userId === user.uid) {
         setErrors({ general: "Cannot delete your own account" });
         setTimeout(() => setErrors({}), 3000);
         return;
       }
-
       await firebase.firestore().collection("users").doc(userId).delete();
       setUsers(users.filter((user) => user.id !== userId));
       setSuccess("User deleted successfully");
@@ -114,20 +95,15 @@ const AdminDashboard = () => {
       setErrors({ general: "Failed to delete user" });
     }
   };
-
-  // Handle profile image upload
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const user = firebase.auth().currentUser;
     if (!user) {
       setErrors({ general: "No authenticated user" });
       return;
     }
-
     try {
-      // Check role = admin
       const userDoc = await firebase
         .firestore()
         .collection("users")
@@ -135,15 +111,12 @@ const AdminDashboard = () => {
         .get();
       const userData = userDoc.exists ? userDoc.data() : {};
       if (userData.role !== "admin") {
-        setErrors({ general: "Only admin can uploaded profile image" });
+        setErrors({ general: "Only admin can upload profile image" });
         return;
       }
-
-      // Upload to Cloudinary
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", "test_test");
-
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/db8dtpaus/image/upload",
         {
@@ -151,14 +124,11 @@ const AdminDashboard = () => {
           body: formData,
         }
       );
-
       const data = await res.json();
       const cloudinaryUrl = data.secure_url;
-
       await firebase.firestore().collection("users").doc(user.uid).update({
         profileImage: cloudinaryUrl,
       });
-
       setProfile((prev) => ({ ...prev, profileImage: cloudinaryUrl }));
       setSuccess("Profile image updated");
       setTimeout(() => setSuccess(""), 3000);
@@ -166,25 +136,20 @@ const AdminDashboard = () => {
       setErrors({ general: "Failed to upload image" });
     }
   };
-
-  // Handle profile update
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setErrors({});
     setSuccess("");
-
     const user = firebase.auth().currentUser;
     if (!user) {
       setErrors({ general: "No authenticated user" });
       return;
     }
-
     const newErrors = {};
     if (!profile.name.trim()) newErrors.name = "Name is required";
     if (!profile.email.trim()) newErrors.email = "Email is required";
     if (!/^\S+@\S+\.\S+$/.test(profile.email))
       newErrors.email = "Invalid email";
-
     if (profile.newPassword) {
       if (!profile.currentPassword)
         newErrors.currentPassword = "Current password required";
@@ -193,17 +158,14 @@ const AdminDashboard = () => {
       if (profile.newPassword !== profile.confirmPassword)
         newErrors.confirmPassword = "Passwords don't match";
     }
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
     try {
       if (user.displayName !== profile.name) {
         await user.updateProfile({ displayName: profile.name });
       }
-
       if (user.email !== profile.email) {
         const credential = firebase.auth.EmailAuthProvider.credential(
           user.email,
@@ -212,7 +174,6 @@ const AdminDashboard = () => {
         await user.reauthenticateWithCredential(credential);
         await user.updateEmail(profile.email);
       }
-
       if (profile.newPassword) {
         const credential = firebase.auth.EmailAuthProvider.credential(
           reAuthEmail,
@@ -221,31 +182,19 @@ const AdminDashboard = () => {
         await user.reauthenticateWithCredential(credential);
         await user.updatePassword(profile.newPassword);
       }
-
       setProfile((prev) => ({
         ...prev,
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       }));
-
       setSuccess("Profile updated successfully");
       setTimeout(() => setSuccess(""), 3000);
     } catch (error) {
-      let errorMsg = "Failed to update profile";
-      if (error.code === "auth/invalid-credential") {
-        errorMsg = "Incorrect current password";
-      } else if (error.code === "auth/requires-recent-login") {
-        errorMsg =
-          "Please reauthenticate to update sensitive information. You might need to log out and log back in.";
-      } else if (error.code === "auth/email-already-in-use") {
-        errorMsg = "This email address is already in use by another account.";
-      }
+      let errorMsg = error.message
       setErrors({ general: errorMsg });
     }
   };
-
-  // Handle logout
   const handleLogout = async () => {
     try {
       await firebase.auth().signOut();
@@ -254,22 +203,18 @@ const AdminDashboard = () => {
       setErrors({ general: "Failed to logout" });
     }
   };
-
   const filteredUsers = users.filter(
     (user) =>
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (user.displayName &&
         user.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-
   return (
     <div className="min-h-screen bg-gray-50 flex font-sans">
-      {/* Mobile sidebar toggle */}
       <div className="md:hidden fixed top-0 left-0 right-0 bg-primary p-4 flex justify-between items-center z-30 shadow-md">
         <h1 className="text-xl font-bold text-white font-heading">
           Admin Dashboard
         </h1>
-
         <motion.button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="text-white focus:outline-none"
@@ -306,8 +251,6 @@ const AdminDashboard = () => {
           </svg>
         </motion.button>
       </div>
-
-      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 md:static w-64 bg-primary-dark text-white transition-transform duration-300 ease-in-out z-20 flex flex-col shadow-lg`}
@@ -357,17 +300,12 @@ const AdminDashboard = () => {
           </button>
         </div>
       </aside>
-
-      {/* Main content */}
       <main className="flex-1 md:ml-0 mt-16 md:mt-0">
-        {/* Header */}
         <header className="bg-white shadow-sm p-6 sticky top-0 md:top-0 z-10">
           <h1 className="text-2xl font-bold text-dark font-heading">
             {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
           </h1>
         </header>
-
-        {/* Content */}
         <div
           className="p-6 overflow-y-auto"
           style={{ height: "calc(100vh - 80px)" }}
@@ -471,15 +409,11 @@ const AdminDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="flex-shrink-0 h-10 w-10 rounded-ful flex items-center justify-center">
-                                  {user.profileImage &&
-                                    (user.role === "admin" ||
-                                      user.id !== user.uid ? (
-                                      <img
-                                        src={user.profileImage}
-                                        alt="Profile"
-                                        className="w-full h-full object-cover"
-                                      />
-                                    ) : null)}
+                                  <img
+                                    src={user.profileImage}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                  />
                                 </div>
                                 <div className="ml-4">
                                   <div className="text-sm font-medium text-dark">
@@ -523,7 +457,6 @@ const AdminDashboard = () => {
                 )}
               </motion.div>
             ) : (
-              // Profile Tab
               <motion.div
                 key="profile"
                 initial={{ opacity: 0, y: 20 }}
@@ -588,7 +521,6 @@ const AdminDashboard = () => {
                         <p className="text-dark-muted">{profile.email}</p>
                       </div>
                     </div>
-
                     <div>
                       <label
                         htmlFor="name"
@@ -613,7 +545,6 @@ const AdminDashboard = () => {
                         <p className="mt-1 text-sm text-red-600">{errors.name}</p>
                       )}
                     </div>
-
                     <div>
                       <label
                         htmlFor="email"
@@ -698,7 +629,6 @@ const AdminDashboard = () => {
                         </p>
                       )}
                     </div>
-
                     <div>
                       <label
                         htmlFor="confirmPassword"
