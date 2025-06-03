@@ -28,7 +28,7 @@ const SellerDashboard = () => {
     const renderContent = () => {
         switch (activeTab) {
             case "add-product":
-                return <AddProductTab />;
+                return <AddProductTab onSuccess={() => setActiveTab("all-products")} />;
             case "all-products":
                 return <AllProductsTab />;
             case "profile":
