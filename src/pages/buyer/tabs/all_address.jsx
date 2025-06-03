@@ -5,8 +5,9 @@ import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import AddAddressTab from './add_address';
 
-const AllAddressTab = () => {
+const AllAddressTab = ({ onEmpty }) => {
   const [addresses, setAddresses] = useState([]);
+  const [editingAddress, setEditingAddress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -17,21 +18,23 @@ const AllAddressTab = () => {
       if (!user) {
         setError('User not logged in');
         setLoading(false);
+        setTimeout(() => { setError('') }, 3000)
         return;
       }
 
       try {
         const snapshot = await firebase.firestore()
           .collection('addresses')
-          .where('userId', '==', user.uid)
+          .where('buyerId', '==', user.uid)
           .orderBy('createdAt', 'desc')
           .get();
 
         const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setAddresses(list);
       } catch (err) {
-        console.error("Error fetching addresses:", err);
+        setError("Error fetching addresses:");
         setError('Failed to load addresses');
+        setTimeout(() => { setError('') }, 3000)
       } finally {
         setLoading(false);
       }
@@ -46,15 +49,35 @@ const AllAddressTab = () => {
         await firebase.firestore().collection('addresses').doc(id).delete();
         setAddresses(prev => prev.filter(a => a.id !== id));
       } catch (err) {
-        console.error("Error deleting address:", err);
+        setError("Error deleting address:");
         setError('Failed to delete address');
+        setTimeout(() => { setError('') }, 3000)
       }
     }
   };
 
-  const AnotherPage = () => {
-    <AddAddressTab />
+  const handleUpdate = (updatedAddress) => {
+    setAddresses(prev =>
+      prev.map(addr => addr.id === updatedAddress.id ? updatedAddress : addr)
+    );
+    setEditingAddress(null);
+  };
+
+  const onEmptyy = () => {
+    if (onEmpty) onEmpty()
   }
+
+  if (editingAddress) {
+    return (
+      <AddAddressTab
+        initialAddress={editingAddress}
+        onSave={handleUpdate}
+        onCancel={() => setEditingAddress(null)}
+      />
+    );
+  }
+
+
 
   if (loading) {
     return (
@@ -93,7 +116,7 @@ const AllAddressTab = () => {
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <p className="text-gray-500 mb-4">You haven't added any addresses yet</p>
           <button
-            onClick={AnotherPage}
+            onClick={onEmptyy}
             className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg"
           >
             Add Your First Address
@@ -121,13 +144,14 @@ const AllAddressTab = () => {
                   </div>
                   <div className="flex gap-2">
                     <button
-                      className="text-blue-500 hover:text-blue-700 p-2"
+                      className="text-primary hover:text-primary-light p-2"
+                      onClick={() => setEditingAddress(address)}
                     >
                       <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(address.id)}
-                      className="text-red-500 hover:text-red-700 p-2"
+                      className="text-accent-red hover:text-accent-red/70 p-2"
                     >
                       <FaTrash />
                     </button>
