@@ -249,7 +249,7 @@ const AdminDashboard = () => {
   const handleLogout = async () => {
     try {
       await firebase.auth().signOut();
-      navigate("/signin");
+      navigate("/");
     } catch (error) {
       setErrors({ general: "Failed to logout" });
     }
