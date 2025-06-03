@@ -220,16 +220,17 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
 
 
                 if (!duplicateCheck.empty) {
-                    setErrors("A similar product already exists.");
+                    alert("A similar product already exists.");
                     setTimeout(() => setErrors(""), 3000);
                     return;
-                }
+                }else{
                 await firebase
                     .firestore()
                     .collection("products")
                     .doc(initialProduct.id)
                     .update(productData);
                 if (onSave) onSave(productData);
+                }
 
 
             } else {
@@ -276,6 +277,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
                     'Failed to update product' :
                     'Failed to add product'
             });
+            
             console.log(error);
             setTimeout(() => {
                 setErrors({});
