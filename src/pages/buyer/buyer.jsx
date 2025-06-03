@@ -30,7 +30,9 @@ const SellerDashboard = () => {
             case "add_address":
                 return <AddAddressTab onSuccess={() => setActiveTab("all_address")} />;
             case "all_address":
-                return <AllAddressTab />;
+                return (
+                  <AllAddressTab onEmpty={() => setActiveTab("add_address")} />
+                );
             default:
                 return null;
         }
