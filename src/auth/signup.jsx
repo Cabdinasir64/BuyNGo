@@ -3,7 +3,6 @@ import firebase from "/firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { googleProvider, facebookProvider } from "../../firebase.js";
 
-// SVG Icons
 const GoogleIcon = () => (
     <svg
         className="w-5 h-5"
@@ -51,7 +50,7 @@ export default function Signup() {
         username: "",
         email: "",
         password: "",
-        role: "buyer", // Default role
+        role: "buyer",
     });
     const [errors, setErrors] = useState({
         username: "",
@@ -60,7 +59,6 @@ export default function Signup() {
     });
     const [isLoading, setIsLoading] = useState(false);
 
-    // Check if username/email exists
     const checkUnique = async (field, value) => {
         const snapshot = await firebase
             .firestore()
@@ -70,7 +68,6 @@ export default function Signup() {
         return snapshot.empty;
     };
 
-    // Validate Form
     const validate = async () => {
         let valid = true;
         const newErrors = { username: "", email: "", password: "" };
@@ -109,7 +106,6 @@ export default function Signup() {
         return valid;
     };
 
-    // Handle Signup 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -140,7 +136,6 @@ export default function Signup() {
         }
     };
 
-    // Social Login
     const handleSocialLogin = async (provider) => {
         try {
             setIsLoading(true);
@@ -173,7 +168,6 @@ export default function Signup() {
                         lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                     });
             }
-
             navigate("/");
         } catch (err) {
             setError(err.message);
@@ -185,25 +179,19 @@ export default function Signup() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-light to-primary-dark flex items-center justify-center p-4 sm:p-6">
             <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-                {/* Header with Branding */}
                 <div className="bg-primary-DEFAULT p-6 text-center">
                     <h1 className="text-2xl sm:text-3xl font-heading font-bold text-primary-light">
                         Join Our Community
                     </h1>
                     <p className="text-primary-DEFAULT mt-1">Sign up to get started</p>
                 </div>
-
                 <div className="p-6 sm:p-8">
-                    {/* Error Message */}
                     {error && (
                         <div className="mb-4 p-3 bg-accent-red/10 border-l-4 border-accent-red text-accent-red rounded-lg">
                             <p>{error}</p>
                         </div>
                     )}
-
-                    {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Username */}
                         <div>
                             <label
                                 htmlFor="username"
@@ -223,7 +211,7 @@ export default function Signup() {
                                     ? "border-accent-red focus:ring-accent-red/30"
                                     : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
                                     }`}
-                                placeholder="johndoe"
+                                placeholder="Username"
                                 autoComplete="username"
                             />
                             {errors.username && (
@@ -232,8 +220,6 @@ export default function Signup() {
                                 </p>
                             )}
                         </div>
-
-                        {/* Email */}
                         <div>
                             <label
                                 htmlFor="email"
@@ -253,15 +239,13 @@ export default function Signup() {
                                     ? "border-accent-red focus:ring-accent-red/30"
                                     : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
                                     }`}
-                                placeholder="john@example.com"
+                                placeholder="Name@example.com"
                                 autoComplete="email"
                             />
                             {errors.email && (
                                 <p className="mt-1 text-sm text-accent-red">{errors.email}</p>
                             )}
                         </div>
-
-                        {/* Password */}
                         <div>
                             <label
                                 htmlFor="password"
@@ -290,11 +274,8 @@ export default function Signup() {
                                 </p>
                             )}
                         </div>
-
-                        {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={isLoading}
                             className={`w-full py-3 px-4 rounded-lg font-medium bg-primary-dark text-white transition-colors ${isLoading
                                 ? "bg-primary-light cursor-not-allowed"
                                 : "hover:bg-primary-dark/80"
@@ -329,8 +310,6 @@ export default function Signup() {
                             )}
                         </button>
                     </form>
-
-                    {/* Divider */}
                     <div className="my-6 relative">
                         <div className="absolute inset-0 flex items-center">
                             <div className="w-full border-t border-gray-300"></div>
@@ -341,13 +320,10 @@ export default function Signup() {
                             </span>
                         </div>
                     </div>
-
-                    {/* Social Buttons */}
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             type="button"
                             onClick={() => handleSocialLogin("google")}
-                            disabled={isLoading}
                             className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-300 bg-white text-dark-DEFAULT hover:bg-gray-100 transition-colors disabled:opacity-50"
                         >
                             <GoogleIcon />
@@ -356,15 +332,12 @@ export default function Signup() {
                         <button
                             type="button"
                             onClick={() => handleSocialLogin("facebook")}
-                            disabled={isLoading}
                             className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-300 bg-white text-dark-DEFAULT hover:bg-gray-100 transition-colors disabled:opacity-50"
                         >
                             <FacebookIcon />
                             <span>Facebook</span>
                         </button>
                     </div>
-
-                    {/* Login Link */}
                     <div className="mt-6 text-center text-sm text-dark-muted">
                         <p>
                             Already have an account?{" "}
