@@ -6,6 +6,7 @@ import AdminDashboard from "./pages/admin/admin";
 import Category from './pages/category'
 import Product from './pages/product'
 import Home from './pages/home/home'
+import Cart from './pages/cart'
 
 
 function App() {
@@ -17,8 +18,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sellerdashboard" element={<SellerDashboard />} />
-          <Route path="/category/:categorySlug/:subcategorySlug" element={<Category />} />
+          <Route
+            path="/category/:categorySlug/:subcategorySlug"
+            element={<Category />}
+          />
           <Route path="/product/:productId" element={<Product />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/admindashboard" element={<AdminDashboard />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
