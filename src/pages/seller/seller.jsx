@@ -8,6 +8,7 @@ import ProfileTab from './tabs/profile'
 import AddProductTab from './tabs/add_product'
 import AllProductsTab from './tabs/all_products'
 
+
 const SellerDashboard = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("add-product");
@@ -17,7 +18,7 @@ const SellerDashboard = () => {
     const handleLogout = async () => {
         try {
             await firebase.auth().signOut();
-            navigate("/signin");
+            navigate("/");
         } catch (error) {
             setErrors({ general: "Failed to logout" });
         }
