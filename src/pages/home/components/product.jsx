@@ -17,7 +17,7 @@ function Product() {
 
         return () => unsubscribe();
     }, []);
- 
+
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -101,7 +101,6 @@ function Product() {
                                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                onClick={() => handleProductClick(product)}
                                 whileHover={{ y: -5 }}
                                 transition={{
                                     delay: idx * 0.01,
@@ -118,6 +117,7 @@ function Product() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ delay: 0.3 }}
+                                        onClick={() => handleProductClick(product)}
                                     />
                                 </div>
 
