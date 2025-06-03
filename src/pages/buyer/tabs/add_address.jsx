@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import firebase from '/firebase';
 import { motion } from 'framer-motion';
+import { FaSpinner } from "react-icons/fa";
 
-const AddAddressTab = ({ onSuccess }) => {
-    const [form, setForm] = useState({
+const AddAddressTab = ({ initialAddress, onSave, onCancel, onSuccess }) => {
+    const defaultState = {
         fullName: '',
         phone: '',
         street: '',
@@ -11,10 +12,15 @@ const AddAddressTab = ({ onSuccess }) => {
         state: '',
         country: 'Somalia',
         zip: ''
-    });
+    };
+    const [form, setForm] = useState(initialAddress || defaultState);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    useEffect(() => {
+        setForm(initialAddress || defaultState);
+    }, [initialAddress]);
 
     const handleChange = e => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -22,33 +28,84 @@ const AddAddressTab = ({ onSuccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
         setError('');
         setSuccess('');
 
         const user = firebase.auth().currentUser;
         if (!user) {
             setError('User not logged in');
-            setLoading(false);
             return;
         }
 
         try {
-            await firebase.firestore().collection('addresses').add({
-                ...form,
-                userId: user.uid,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            setLoading(true);
 
-            setForm({
-                fullName: '', phone: '', street: '', city: '',
-                state: '', country: 'Somalia', zip: ''
-            });
-            setSuccess('Address added successfully!');
-            if (onSuccess) onSuccess();
+            const adressData = {
+                ...form,
+                buyerId: user.uid,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+
+            if (initialAddress) {
+
+                const snapshot = await firebase
+                    .firestore()
+                    .collection("addresses")
+                    .where("street", "==", form.street)
+                    .where("city", "==", form.city)
+                    .where("state", "==", form.state)
+                    .where("zip", "==", form.zip)
+                    .where("country", "==", form.country)
+                    .where("phone", "==", form.phone)
+                    .where("fullName", "==", form.fullName)
+                    .get();
+
+                if (!snapshot.empty) {
+                    setError('Address already exists.');
+                    setLoading(false);
+                    setTimeout(() => setError(''), 3000);
+                    return;
+                }
+                else {
+                    await firebase.firestore()
+                        .collection('addresses')
+                        .doc(initialAddress.id)
+                        .update(adressData);
+
+                    if (onSave) onSave(adressData);
+                    setSuccess('Address updated successfully!');
+                }
+
+            } else {
+                const snapshot = await firebase
+                    .firestore()
+                    .collection("addresses")
+                    .where("street", "==", form.street)
+                    .where("city", "==", form.city)
+                    .where("state", "==", form.state)
+                    .where("zip", "==", form.zip)
+                    .where("country", "==", form.country)
+                    .where("phone", "==", form.phone)
+                    .where("fullName", "==", form.fullName)
+                    .get();
+                if (!snapshot.empty) {
+                    setError('Address already exists.');
+                    setLoading(false);
+                    setTimeout(() => setError(''), 3000);
+                    return;
+                }
+                adressData.buyerId = user.uid;
+                adressData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                await firebase.firestore().collection('addresses').add(adressData);
+                setSuccess('Address added successfully!');
+                if (onSuccess) onSuccess();
+                setTimeout(() => setSuccess(''), 3000);
+            }
         } catch (err) {
-            console.error("Error adding address:", err);
+            console.error(err);
             setError('Failed to save address. Please try again.');
+            setTimeout(() => setError(''), 3000);
         } finally {
             setLoading(false);
         }
@@ -62,7 +119,7 @@ const AddAddressTab = ({ onSuccess }) => {
             className="max-w-2xl mx-auto"
         >
             <form onSubmit={handleSubmit} className="space-y-4 p-6 bg-white rounded-lg shadow">
-                <h2 className="text-xl font-bold mb-4">Add New Address</h2>
+                <h2 className="text-xl font-bold mb-4">{initialAddress ? 'Edit Address' : 'Add New Address'}</h2>
 
                 {error && (
                     <div className="p-3 bg-red-100 text-red-700 rounded-lg">
@@ -161,12 +218,25 @@ const AddAddressTab = ({ onSuccess }) => {
                     </select>
                 </div>
 
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full mt-4 bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-medium transition flex items-center justify-center gap-2"
-                >
-                    {loading ? 'Saving...' : 'Save Address'}
+                {onCancel && (
+                    <button
+                        onClick={onCancel}
+                        type="button"
+                        className="px-4 py-2 bg-gray-200 rounded mt-4 mr-2"
+                    >
+                        Cancel
+                    </button>
+                )}
+
+                <button type="submit" disabled={loading} className="bg-primary text-white px-6 py-2 rounded flex items-center">
+                    {loading ? (
+                        <>
+                            <FaSpinner className="animate-spin mr-2" />
+                            {initialAddress ? 'Updating...' : 'Adding...'}
+                        </>
+                    ) : (
+                        initialAddress ? 'Update Adress' : 'Add Address'
+                    )}
                 </button>
             </form>
         </motion.div>
