@@ -4,7 +4,8 @@ import Hero from './components/hero'
 import Product from "./components/product";
 import Features from './components/features';
 import Testimonials from './components/testimonial';
-import Footer from "./components/footer";
+import Faq from "./components/faq";
+import Footer from "../../components/footer";
 
 const Home = () => {
     return (
@@ -14,6 +15,7 @@ const Home = () => {
             <Product />
             <Features />
             <Testimonials />
+            <Faq />
             <Footer />
         </>
     );
