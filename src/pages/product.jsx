@@ -23,7 +23,8 @@ const Product = () => {
     const [reviews, setReviews] = useState([]);
     const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
     const [seller, setSeller] = useState(null);
-    // Calculate average rating
+    const [sellerid, setSellerId] = useState(null)
+
     const averageRating = reviews.length > 0
         ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
         : 0;
@@ -58,11 +59,12 @@ const Product = () => {
                         const sellerDoc = await firebase.firestore().collection('users').doc(foundProduct.sellerId).get();
                         if (sellerDoc.exists) {
                             setSeller(sellerDoc.data());
+                            setSellerId(foundProduct.sellerId);
                         }
                     }
                     // Fetch related products
                     const related = productsData
-                        .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
+                        .filter(p => p.category === foundProduct.category)
                         .slice(0, 8);
                     setRelatedProducts(related);
                 } else {
@@ -97,7 +99,7 @@ const Product = () => {
             setReviews(snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
-                createdAt: doc.data().createdAt?.toDate()
+                createdAt: doc.data().createdAt?.toDate() || 'N/A'
             })));
         };
         fetchReviews();
@@ -105,14 +107,6 @@ const Product = () => {
 
     const handleImageChange = (index) => {
         setSelectedImage(index);
-    };
-
-    const nextImage = () => {
-        setSelectedImage(prev => (prev + 1) % product.images.length);
-    };
-
-    const prevImage = () => {
-        setSelectedImage(prev => (prev - 1 + product.images.length) % product.images.length);
     };
 
     const handleProductClick = (product) => {
@@ -130,6 +124,7 @@ const Product = () => {
         await firebase.firestore().collection('reviews').add({
             productId: slug,
             buyerId: user.uid,
+            sellerId: sellerid,
             username: user.displayName || user.email,
             rating: newReview.rating,
             comment: newReview.comment,
@@ -144,14 +139,15 @@ const Product = () => {
         setReviews(snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data(),
-            createdAt: doc.data().createdAt?.toDate()
+            createdAt: doc.data().createdAt?.toDate() || 'N/A'
         })));
     };
 
     const renderStars = (rating) => {
         const stars = [];
         const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 !== 0;
+        const decimalPart = rating - fullStars;
+        const hasHalfStar = decimalPart >= 0.5;
 
         for (let i = 1; i <= 5; i++) {
             if (i <= fullStars) {
@@ -167,9 +163,12 @@ const Product = () => {
     };
 
     if (loading) return (
-        <div className="min-h-screen bg-gray-50 flex justify-center items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
+        <>
+            <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+                <Navbar />
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        </>
     );
 
     if (error) return (
@@ -191,48 +190,34 @@ const Product = () => {
                 >
                     {/* Product Images */}
                     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div className="relative h-96 w-full">
-                            <AnimatePresence mode='wait'>
+                        <div className="relative h-80 w-full">
+                            <AnimatePresence mode="wait">
                                 <motion.img
                                     key={selectedImage}
-                                    src={product.images?.[selectedImage] || product.mainImage}
+                                    src={product.images[selectedImage] || product.mainImage}
                                     alt={product.name}
                                     className="w-full h-full object-contain"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.3 }}
                                 />
                             </AnimatePresence>
-
-                            {product.images?.length > 1 && (
-                                <>
-                                    <button
-                                        onClick={prevImage}
-                                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 rounded-full p-2 shadow-md hover:bg-opacity-100 transition"
-                                    >
-                                        <FaChevronLeft className="text-gray-800" />
-                                    </button>
-                                    <button
-                                        onClick={nextImage}
-                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 rounded-full p-2 shadow-md hover:bg-opacity-100 transition"
-                                    >
-                                        <FaChevronRight className="text-gray-800" />
-                                    </button>
-                                </>
-                            )}
                         </div>
 
                         {/* Thumbnail Gallery */}
-                        {product.images?.length > 1 && (
-                            <div className="flex p-4 space-x-2 overflow-x-auto">
+                        {product.images.length > 1 && (
+                            <div className="flex p-4 space-x-2 overflow-x-auto mt-4">
                                 {product.images.map((img, index) => (
                                     <motion.div
                                         key={index}
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                         onClick={() => handleImageChange(index)}
-                                        className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden cursor-pointer border-2 ${selectedImage === index ? 'border-primary' : 'border-transparent'}`}
+                                        className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden cursor-pointer border-2 ${selectedImage === index
+                                            ? "border-primary"
+                                            : "border-transparent"
+                                            }`}
                                     >
                                         <img
                                             src={img}
@@ -252,13 +237,13 @@ const Product = () => {
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.2 }}
                         >
-                            <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+                            <h1 className="text-3xl font-bold text-gray-900">
+                                {product.name}
+                            </h1>
                             <div className="flex items-center mt-2 space-x-2">
-                                <div className="flex">
-                                    {renderStars(averageRating)}
-                                </div>
+                                <div className="flex">{renderStars(averageRating)}</div>
                                 <span className="text-gray-500">
-                                    ({reviews.length} review{reviews.length !== 1 ? 's' : ''})
+                                    ({reviews.length} review{reviews.length !== 1 ? "s" : ""})
                                 </span>
                             </div>
                         </motion.div>
@@ -268,12 +253,11 @@ const Product = () => {
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-blue-50 p-4 rounded-lg"
+                            className="bg-primary/10 p-4 rounded-lg"
                         >
-                            <p className="text-primary font-bold text-3xl mb-1">${product.price}</p>
-                            {product.originalPrice && (
-                                <p className="text-gray-500 line-through">${product.originalPrice}</p>
-                            )}
+                            <p className="text-primary font-bold text-3xl mb-1">
+                                ${product.price}
+                            </p>
                         </motion.div>
 
                         {/* Description */}
@@ -293,7 +277,9 @@ const Product = () => {
                                     onClick={() => setWishlist(!wishlist)}
                                     className="p-3 rounded-full border border-gray-300 hover:bg-gray-100 transition"
                                 >
-                                    <FaHeart className={wishlist ? "text-red-500" : "text-gray-400"} />
+                                    <FaHeart
+                                        className={wishlist ? "text-red-500" : "text-gray-400"}
+                                    />
                                 </button>
                                 <button className="p-3 rounded-full border border-gray-300 hover:bg-gray-100 transition">
                                     <FaShareAlt className="text-gray-600" />
@@ -318,8 +304,13 @@ const Product = () => {
                                         <FaUser className="text-gray-600" />
                                     </div>
                                     <div>
-                                        <p className="font-medium">{seller.displayName || seller.email}</p>
-                                        <p className="text-sm text-gray-500">Joined: {seller.createdAt?.toDate().toLocaleDateString()}</p>
+                                        <p className="font-medium">
+                                            {seller.displayName || seller.email}
+                                        </p>
+                                        <p className="text-sm text-gray-500">
+                                            Joined:{" "}
+                                            {seller.createdAt.toDate().toLocaleDateString()}
+                                        </p>
                                     </div>
                                 </div>
                             </motion.div>
@@ -357,14 +348,16 @@ const Product = () => {
                     <h2 className="text-2xl font-bold mb-6">Product Details</h2>
 
                     {/* Properties Table */}
-                    {product.properties?.length > 0 && (
+                    {product.properties.length > 0 && (
                         <div className="mb-8">
                             <h3 className="text-lg font-semibold mb-4">Specifications</h3>
                             <table className="w-full">
                                 <tbody className="divide-y divide-gray-200">
                                     {product.properties.map((prop, index) => (
                                         <tr key={index}>
-                                            <td className="py-3 px-4 font-medium text-gray-700 bg-gray-50">{prop.key}</td>
+                                            <td className="py-3 px-4 font-medium text-gray-700 bg-gray-50">
+                                                {prop.key}
+                                            </td>
                                             <td className="py-3 px-4">{prop.value}</td>
                                         </tr>
                                     ))}
@@ -389,11 +382,10 @@ const Product = () => {
                         <div className="flex items-center">
                             <span className="text-3xl font-bold mr-2">{averageRating}</span>
                             <div className="flex flex-col">
-                                <div className="flex">
-                                    {renderStars(averageRating)}
-                                </div>
+                                <div className="flex">{renderStars(averageRating)}</div>
                                 <span className="text-sm text-gray-500">
-                                    Based on {reviews.length} review{reviews.length !== 1 ? 's' : ''}
+                                    Based on {reviews.length} review
+                                    {reviews.length !== 1 ? "s" : ""}
                                 </span>
                             </div>
                         </div>
@@ -402,13 +394,18 @@ const Product = () => {
                     {reviews.length === 0 ? (
                         <div className="text-center py-8">
                             <FaCommentAlt className="mx-auto text-4xl text-gray-300 mb-3" />
-                            <p className="text-gray-500">No reviews yet. Be the first to review this product.</p>
+                            <p className="text-gray-500">
+                                No reviews yet. Be the first to review this product.
+                            </p>
                         </div>
                     ) : (
                         <div className="space-y-6 max-h-48 overflow-y-auto">
-                            {reviews.map(review => (
-                                <div key={review.id} className="border-b pb-4 last:border-b-0">
-                                    <div className="flex justify-between items-start mb-2">
+                            {reviews.map((review) => (
+                                <div
+                                    key={review.id}
+                                    className="border-b pb-4 last:border-b-0"
+                                >
+                                    <div className="flex justify-between mb-2">
                                         <div className="flex items-center space-x-3">
                                             <div className="bg-gray-200 rounded-full p-2">
                                                 <FaUser className="text-gray-600" />
@@ -417,14 +414,22 @@ const Product = () => {
                                                 <p className="font-medium">{review.username}</p>
                                                 <div className="flex items-center">
                                                     <div className="flex mr-2">
-                                                        {[...Array(5)].map((_, i) => (
-                                                            i < review.rating ?
-                                                                <FaStar key={i} className="text-yellow-400 text-sm" /> :
-                                                                <FaRegStar key={i} className="text-yellow-400 text-sm" />
-                                                        ))}
+                                                        {[...Array(5)].map((_, i) =>
+                                                            i < review.rating ? (
+                                                                <FaStar
+                                                                    key={i}
+                                                                    className="text-yellow-400 text-sm"
+                                                                />
+                                                            ) : (
+                                                                <FaRegStar
+                                                                    key={i}
+                                                                    className="text-yellow-400 text-sm"
+                                                                />
+                                                            )
+                                                        )}
                                                     </div>
                                                     <span className="text-xs text-gray-500">
-                                                        {review.createdAt?.toLocaleDateString()}
+                                                        {review.createdAt.toLocaleDateString()}
                                                     </span>
                                                 </div>
                                             </div>
@@ -444,12 +449,17 @@ const Product = () => {
                                 <div>
                                     <label className="block mb-2">Your Rating</label>
                                     <div className="flex space-x-1">
-                                        {[1, 2, 3, 4, 5].map(star => (
+                                        {[1, 2, 3, 4, 5].map((star) => (
                                             <button
                                                 key={star}
                                                 type="button"
-                                                onClick={() => setNewReview({ ...newReview, rating: star })}
-                                                className={`text-2xl ${newReview.rating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                onClick={() =>
+                                                    setNewReview({ ...newReview, rating: star })
+                                                }
+                                                className={`text-2xl ${newReview.rating >= star
+                                                    ? "text-yellow-400"
+                                                    : "text-gray-300"
+                                                    }`}
                                             >
                                                 <FaStar />
                                             </button>
@@ -457,11 +467,15 @@ const Product = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="review" className="block mb-2">Your Review</label>
+                                    <label htmlFor="review" className="block mb-2">
+                                        Your Review
+                                    </label>
                                     <textarea
                                         id="review"
                                         value={newReview.comment}
-                                        onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                                        onChange={(e) =>
+                                            setNewReview({ ...newReview, comment: e.target.value })
+                                        }
                                         className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                                         rows="4"
                                         placeholder="Share your thoughts about this product..."
@@ -476,9 +490,11 @@ const Product = () => {
                             </form>
                         ) : (
                             <div className="text-center py-6">
-                                <p className="text-gray-500 mb-3">Please login to leave a review.</p>
+                                <p className="text-gray-500 mb-3">
+                                    Please login to leave a review.
+                                </p>
                                 <button
-                                    onClick={() => navigate('/login')}
+                                    onClick={() => navigate("/signin")}
                                     className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
                                 >
                                     Login
@@ -511,7 +527,9 @@ const Product = () => {
                                         className="w-full h-40 object-cover"
                                     />
                                     <div className="p-3">
-                                        <h3 className="font-medium text-gray-900 truncate">{product.name}</h3>
+                                        <h3 className="font-medium text-gray-900 truncate">
+                                            {product.name}
+                                        </h3>
                                         <p className="text-primary font-bold">${product.price}</p>
                                     </div>
                                 </motion.div>
