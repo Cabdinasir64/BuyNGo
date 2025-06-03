@@ -201,6 +201,7 @@ const Product = () => {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.3 }}
+
                                 />
                             </AnimatePresence>
                         </div>
@@ -519,12 +520,12 @@ const Product = () => {
                                     key={product.id}
                                     whileHover={{ y: -5 }}
                                     className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
-                                    onClick={() => handleProductClick(product)}
                                 >
                                     <img
                                         src={product.mainImage}
                                         alt={product.name}
                                         className="w-full h-40 object-cover"
+                                        onClick={() => handleProductClick(product)}
                                     />
                                     <div className="p-3">
                                         <h3 className="font-medium text-gray-900 truncate">
