@@ -119,13 +119,14 @@ const Category = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
                     {currentProducts.map(product => (
                         <div key={product.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300"
-                            onClick={() => handleProductClick(product)}>
+                        >
                             <div className="h-48 bg-gray-200 overflow-hidden">
                                 {product.mainImage ? (
                                     <img
                                         src={product.mainImage}
                                         alt={product.name}
                                         className="w-full h-full object-cover"
+                                        onClick={() => handleProductClick(product)}
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-gray-100">
