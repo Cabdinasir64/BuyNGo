@@ -14,8 +14,6 @@ const signin = () => {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
-
-    // Validate form fields
     const validate = () => {
         let valid = true;
         const newErrors = { login: "", password: "" };
@@ -36,16 +34,11 @@ const signin = () => {
         setErrors(newErrors);
         return valid;
     };
-
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
-
         if (!validate()) return;
-
         setIsLoading(true);
-
         try {
             let userCredential;
             try {
@@ -58,11 +51,9 @@ const signin = () => {
                         .where("username", "==", formData.login)
                         .limit(1)
                         .get();
-
                     if (snapshot.empty) {
                         throw new Error("Invalid email/username or password");
                     }
-
                     const userDoc = snapshot.docs[0].data();
                     userCredential = await firebase.auth()
                         .signInWithEmailAndPassword(userDoc.email, formData.password);
@@ -70,26 +61,20 @@ const signin = () => {
                     throw emailError;
                 }
             }
-
             const userDoc = await firebase.firestore()
                 .collection("users")
                 .doc(userCredential.user.uid)
                 .get();
-
             if (!userDoc.exists) {
                 throw new Error("User data not found");
             }
-
             const userData = userDoc.data();
-
             await firebase.firestore()
                 .collection("users")
                 .doc(userCredential.user.uid)
                 .update({
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
-            // Redirect based on role
             switch (userData.role) {
                 case "admin":
                     navigate("/admindashboard");
@@ -106,51 +91,41 @@ const signin = () => {
             setIsLoading(false);
         }
     };
-
-    // Handle social login
     const handleSocialLogin = async (provider) => {
         try {
             setIsLoading(true);
             const authProvider = provider === "google" ? googleProvider : facebookProvider;
-
             const { user } = await firebase.auth().signInWithPopup(authProvider);
-
             const userDoc = await firebase.firestore()
                 .collection("users")
                 .doc(user.uid)
                 .get();
-
             if (!userDoc.exists) {
                 throw new Error("User data not found");
             }
-
             const userData = userDoc.data();
-
             await firebase.firestore()
                 .collection("users")
                 .doc(user.uid)
                 .update({
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
             switch (userData.role) {
                 case "admin":
-                    navigate("/admin");
+                    navigate("/admindashboard");
                     break;
                 case "seller":
-                    navigate("/");
+                    navigate("/sellerdashboard");
                     break;
                 default:
                     navigate("/");
             }
-
         } catch (err) {
             setError(err.message);
             setIsLoading(false);
         }
     };
 
-    // SVG Icons
     const GoogleIcon = () => (
         <svg
             className="w-5 h-5"
@@ -194,24 +169,18 @@ const signin = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-light to-primary-dark flex items-center justify-center p-4 sm:p-6">
             <div className="w-full max-w-md">
-                {/* Card Container */}
                 <div className="bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                    {/* Header Section */}
                     <div className="bg-primary-DEFAULT p-6 text-center">
                         <h1 className="text-3xl font-heading font-bold text-primary-light">Welcome Back</h1>
                         <p className="text-primary-DEFAULT mt-2">Sign in to your account</p>
                     </div>
-
-                    {/* Form Section */}
                     <div className="p-6 sm:p-8">
                         {error && (
                             <div className="mb-5 p-3 bg-accent-red/10 border-l-4 border-accent-red text-accent-red rounded-lg">
                                 <p className="text-sm">{error}</p>
                             </div>
                         )}
-
                         <form onSubmit={handleSubmit} className="space-y-5">
-                            {/* Login Field (Email or Username) */}
                             <div>
                                 <label htmlFor="login" className="block text-sm font-medium text-dark-DEFAULT mb-1.5">
                                     Email or Username
@@ -220,7 +189,10 @@ const signin = () => {
                                     id="login"
                                     type="text"
                                     value={formData.login}
-                                    onChange={(e) => setFormData({ ...formData, login: e.target.value })}
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, login: e.target.value });
+                                        setErrors({ ...errors, login: "" });
+                                    }}
                                     className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition-all ${errors.login
                                         ? "border-accent-red focus:ring-accent-red/20"
                                         : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
@@ -236,8 +208,6 @@ const signin = () => {
                                     </p>
                                 )}
                             </div>
-
-                            {/* Password Field */}
                             <div>
                                 <label htmlFor="password" className="block text-sm font-medium text-dark-DEFAULT mb-1.5">
                                     Password
@@ -246,7 +216,10 @@ const signin = () => {
                                     id="password"
                                     type="password"
                                     value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, password: e.target.value })
+                                        setErrors({ ...errors, password: "" });
+                                    }}
                                     className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition-all ${errors.password
                                         ? "border-accent-red focus:ring-accent-red/20"
                                         : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
@@ -262,8 +235,6 @@ const signin = () => {
                                     </p>
                                 )}
                             </div>
-
-                            {/* Forgot Password Link */}
                             <div className="flex justify-end">
                                 <Link
                                     to="/forgot-password"
@@ -272,11 +243,8 @@ const signin = () => {
                                     Forgot password?
                                 </Link>
                             </div>
-
-                            {/* Submit Button */}
                             <button
                                 type="submit"
-                                disabled={isLoading}
                                 className={`w-full py-3 px-4 rounded-lg font-medium bg-primary-dark text-white transition-all duration-200 ${isLoading
                                     ? "bg-primary-light cursor-not-allowed"
                                     : "hover:bg-primary-dark/80 shadow-md hover:shadow-lg"
@@ -295,8 +263,6 @@ const signin = () => {
                                 )}
                             </button>
                         </form>
-
-                        {/* Divider */}
                         <div className="my-6">
                             <div className="relative">
                                 <div className="absolute inset-0 flex items-center">
@@ -309,8 +275,6 @@ const signin = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Social Buttons */}
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 type="button"
