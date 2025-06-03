@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid"
 import React, { useState, useEffect } from 'react';
 import firebase from '/firebase';
 import { useNavigate } from 'react-router-dom';
@@ -65,10 +66,10 @@ const Checkout = () => {
 
             } catch (err) {
                 setError('Failed to load checkout data. Please try again.');
-                 setTimeout(() => {
-                setSuccess('')
-                setError('')
-            }, 3000);
+                setTimeout(() => {
+                    setSuccess('')
+                    setError('')
+                }, 3000);
             } finally {
                 setLoading(false);
             }
@@ -87,7 +88,7 @@ const Checkout = () => {
         }
         if (!selectedAddress) {
             setError('Please select a delivery address');
-             setTimeout(() => {
+            setTimeout(() => {
                 setSuccess('')
                 setError('')
             }, 3000);
@@ -99,6 +100,7 @@ const Checkout = () => {
 
         try {
             await firebase.firestore().collection("orders").add({
+                id: uuidv4(),
                 sellerId: sellerId,
                 buyerId: user.uid,
                 items: cartItems,
@@ -117,7 +119,7 @@ const Checkout = () => {
             }, 2000);
         } catch (error) {
             setError('Failed to place order. Please try again.');
-             setTimeout(() => {
+            setTimeout(() => {
                 setSuccess('')
                 setError('')
             }, 3000);
@@ -167,7 +169,7 @@ const Checkout = () => {
             }, 3000);
         } catch (err) {
             setError('Failed to save address. Please try again.');
-             setTimeout(() => {
+            setTimeout(() => {
                 setSuccess('')
                 setError('')
             }, 3000);
