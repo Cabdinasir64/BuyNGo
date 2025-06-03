@@ -89,7 +89,7 @@ function Footer() {
 
                         {/* Quick Links */}
                         <div>
-                            <h4 className="font-semibold mb-4">Xiriirro Degdeg Ah</h4>
+                            <h4 className="font-semibold mb-4">Qiuck Links</h4>
                             <ul className="space-y-2">
                                 <li>
                                     <a
@@ -120,7 +120,7 @@ function Footer() {
 
                         {/* Contact Info */}
                         <div>
-                            <h4 className="font-semibold mb-4">Xogta Xiriirka</h4>
+                            <h4 className="font-semibold mb-4">Contact Us</h4>
                             <ul className="space-y-2">
                                 <li className="flex items-center">
                                     <FaEnvelope className="mr-2" /> info@buyngo.so
