@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import firebase from "/firebase";
 import { useNavigate } from "react-router-dom";
-import { FaBox, FaChevronDown, FaPlus, FaList } from "react-icons/fa";
+import { FaBox, FaChevronDown, FaPlus, FaList, } from "react-icons/fa";
+import { FaBasketShopping } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 import ProfileTab from './tabs/profile'
 import AddProductTab from './tabs/add_product'
 import AllProductsTab from './tabs/all_products'
+import OrdersTab from './tabs/seller_orders'
 
 
 const SellerDashboard = () => {
@@ -33,6 +35,9 @@ const SellerDashboard = () => {
                 return <AllProductsTab />;
             case "profile":
                 return <ProfileTab />;
+            case "orders":
+                return <OrdersTab />;
+
             case "products":
             default:
                 return null;
@@ -164,6 +169,21 @@ const SellerDashboard = () => {
                     >
                         <CgProfile className="text-lg" />
                         <span>My Profile</span>
+                    </motion.button>
+                    <motion.button
+                        onClick={() => {
+                            setActiveTab("orders");
+                            setIsSidebarOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${activeTab === "orders"
+                            ? "bg-primary text-white hover:bg-primary/80"
+                            : "hover:bg-primary"
+                            }`}
+                        layout="activeTabIndicator"
+                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
+                        <FaBasketShopping className="text-lg" />
+                        <span>Orders</span>
                     </motion.button>
                 </nav>
 
