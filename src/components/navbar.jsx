@@ -193,6 +193,7 @@ const Navbar = () => {
     const handleProductClick = (product) => {
         const slug = product.name.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-');
         navigate(`/product/${slug}`);
+        setQuery('')
     };
 
 
