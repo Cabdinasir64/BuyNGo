@@ -9,6 +9,8 @@ import Home from './pages/home/home'
 import Cart from './pages/cart'
 import BuyerDashboard from './pages/buyer/buyer'
 import Checkout from "./pages/checkout";
+import Shopping from './pages/shopping/shopping'
+import Contact from './pages/contact/contact'
 
 function App() {
 
@@ -28,6 +30,8 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/admindashboard" element={<AdminDashboard />} />
+          <Route path="/shopping" element={<Shopping />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
         </Routes>
