@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid"
 import React, { useState, useEffect } from 'react';
 import firebase from '/firebase';
 import { motion } from 'framer-motion';
@@ -40,7 +41,10 @@ const AddAddressTab = ({ initialAddress, onSave, onCancel, onSuccess }) => {
         try {
             setLoading(true);
 
+
+
             const adressData = {
+                id: uuidv4(),
                 ...form,
                 buyerId: user.uid,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
