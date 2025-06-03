@@ -68,18 +68,9 @@ const AllProducts = () => {
     const handleUpdate = async (updatedProduct) => {
         try {
             setLoading(true);
-            await firebase.firestore()
-                .collection('products')
-                .doc(updatedProduct.id)
-                .update({
-                    ...updatedProduct,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
             setProducts(prev => prev.map(p =>
                 p.id === updatedProduct.id ? updatedProduct : p
             ));
-
             setEditingProduct(null);
             setSuccess('Product updated successfully');
             setTimeout(() => setSuccess(''), 3000);
