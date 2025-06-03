@@ -364,7 +364,7 @@ const Navbar = () => {
                                                 onClick={() => handleProductClick(product)}
                                             >
                                                 <img
-                                                    src={product.mainImage || 'https://via.placeholder.com/50'}
+                                                    src={product.profileImage || 'https://via.placeholder.com/50'}
                                                     alt={product.name}
                                                     className="w-12 h-12 object-cover rounded-md"
                                                 />
@@ -386,7 +386,7 @@ const Navbar = () => {
                                             <img
                                                 src={user.profileImage}
                                                 alt="User"
-                                                className="w-8 h-8 rounded-full object-cover"
+                                                className="w-10 h-10 rounded-full object-cover"
                                             />
                                         ) : (
                                             <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
