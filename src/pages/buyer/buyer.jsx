@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import firebase from "/firebase";
 import { useNavigate } from "react-router-dom";
 import { FaChevronDown, FaPlus, FaList, FaBox } from "react-icons/fa";
+import { FaBasketShopping } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 import ProfileTab from './tabs/profile';
 import AddAddressTab from "./tabs/add_address";
 import AllAddressTab from './tabs/all_address';
-
+import BuyerOrdersTab from './tabs/buyer_orders'
 const SellerDashboard = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("profile");
@@ -30,9 +31,9 @@ const SellerDashboard = () => {
             case "add_address":
                 return <AddAddressTab onSuccess={() => setActiveTab("all_address")} />;
             case "all_address":
-                return (
-                  <AllAddressTab onEmpty={() => setActiveTab("add_address")} />
-                );
+                return <AllAddressTab onEmpty={() => setActiveTab("add_address")} />
+            case "orders":
+                return <BuyerOrdersTab />;
             default:
                 return null;
         }
@@ -159,6 +160,21 @@ const SellerDashboard = () => {
                             </div>
                         )}
                     </div>
+                    <motion.button
+                        onClick={() => {
+                            setActiveTab("orders");
+                            setIsSidebarOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${activeTab === "orders"
+                            ? "bg-primary text-white hover:bg-primary/80"
+                            : "hover:bg-primary"
+                            }`}
+                        layout
+                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
+                        <FaBasketShopping className="text-lg" />
+                        <span>Orders</span>
+                    </motion.button>
                 </nav>
 
                 <div className="p-4 border-t-2 border-primary">
