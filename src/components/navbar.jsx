@@ -325,7 +325,7 @@ const Navbar = () => {
                             </button>
                         </div>
                         <Link
-                            to="/products"
+                            to="/shopping"
                             className="text-dark hover:text-primary transition"
                         >
                             Shopping
@@ -638,7 +638,7 @@ const Navbar = () => {
                             </div>
 
                             <Link
-                                to="/products"
+                                to="/shopping"
                                 className="block px-3 py-3 rounded-md text-dark hover:bg-gray-100"
                                 onClick={toggleMenu}
                             >
