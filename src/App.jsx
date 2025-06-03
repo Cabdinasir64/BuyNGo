@@ -7,6 +7,7 @@ import Category from './pages/category'
 import Product from './pages/product'
 import Home from './pages/home/home'
 import Cart from './pages/cart'
+import BuyerDashboard from './pages/buyer/buyer'
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sellerdashboard" element={<SellerDashboard />} />
+          <Route path="/buyerdashboard" element={<BuyerDashboard />} />
           <Route
             path="/category/:categorySlug/:subcategorySlug"
             element={<Category />}
