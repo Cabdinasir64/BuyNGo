@@ -8,7 +8,7 @@ import Product from './pages/product'
 import Home from './pages/home/home'
 import Cart from './pages/cart'
 import BuyerDashboard from './pages/buyer/buyer'
-
+import Checkout from "./pages/checkout";
 
 function App() {
 
@@ -25,6 +25,7 @@ function App() {
             element={<Category />}
           />
           <Route path="/product/:productId" element={<Product />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/admindashboard" element={<AdminDashboard />} />
           <Route path="/signup" element={<SignUp />} />
