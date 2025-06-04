@@ -22,6 +22,8 @@ const AdminDashboard = () => {
   });
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState("");
+
+  // reding users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -30,11 +32,13 @@ const AdminDashboard = () => {
           .collection("users")
           .orderBy("createdAt", "desc")
           .get();
+
         const usersData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate().toLocaleString() || "N/A",
         }));
+
         setUsers(usersData);
       } catch (error) {
         setErrors({ general: "Failed to load users" });
@@ -44,15 +48,19 @@ const AdminDashboard = () => {
     };
     fetchUsers();
   }, []);
+
+  // rending user login current profile
   useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+    const stopListening = firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         const userDoc = await firebase
           .firestore()
           .collection("users")
           .doc(user.uid)
           .get();
+
         const userData = userDoc.exists ? userDoc.data() : {};
+
         setProfile((prev) => ({
           ...prev,
           name: user.displayName || "",
@@ -61,8 +69,11 @@ const AdminDashboard = () => {
         }));
       }
     });
-    return () => unsubscribe();
+
+    return () => stopListening();
   }, []);
+
+  // role change
   const handleRoleChange = async (userId, newRole) => {
     try {
       await firebase.firestore().collection("users").doc(userId).update({
@@ -79,6 +90,8 @@ const AdminDashboard = () => {
       setErrors({ general: "Failed to update user role" });
     }
   };
+
+  // delete user
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
@@ -95,25 +108,33 @@ const AdminDashboard = () => {
       setErrors({ general: "Failed to delete user" });
     }
   };
+
+  // image upload with cloudinary
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     const user = firebase.auth().currentUser;
+
     if (!user) {
       setErrors({ general: "No authenticated user" });
       return;
     }
+
     try {
       const userDoc = await firebase
         .firestore()
         .collection("users")
         .doc(user.uid)
         .get();
+
       const userData = userDoc.exists ? userDoc.data() : {};
+
       if (userData.role !== "admin") {
         setErrors({ general: "Only admin can upload profile image" });
         return;
       }
+
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", "test_test");
@@ -124,6 +145,7 @@ const AdminDashboard = () => {
           body: formData,
         }
       );
+
       const data = await res.json();
       const cloudinaryUrl = data.secure_url;
       await firebase.firestore().collection("users").doc(user.uid).update({
@@ -136,15 +158,32 @@ const AdminDashboard = () => {
       setErrors({ general: "Failed to upload image" });
     }
   };
+
+  // updating profile
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setErrors({});
     setSuccess("");
+
     const user = firebase.auth().currentUser;
     if (!user) {
       setErrors({ general: "No authenticated user" });
       return;
     }
+
+    const userDoc = await firebase
+      .firestore()
+      .collection("users")
+      .doc(user.uid)
+      .get();
+
+    const userData = userDoc.exists ? userDoc.data() : {};
+
+    if (userData.role !== "admin") {
+      setErrors({ general: "Only admin can update profile" });
+      return;
+    }
+
     const newErrors = {};
     if (!profile.name.trim()) newErrors.name = "Name is required";
     if (!profile.email.trim()) newErrors.email = "Email is required";
@@ -158,10 +197,12 @@ const AdminDashboard = () => {
       if (profile.newPassword !== profile.confirmPassword)
         newErrors.confirmPassword = "Passwords don't match";
     }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
+
     try {
       if (user.displayName !== profile.name) {
         await user.updateProfile({ displayName: profile.name });
@@ -191,10 +232,12 @@ const AdminDashboard = () => {
       setSuccess("Profile updated successfully");
       setTimeout(() => setSuccess(""), 3000);
     } catch (error) {
-      let errorMsg = error.message
+      let errorMsg = error.message;
       setErrors({ general: errorMsg });
     }
   };
+
+  // logout
   const handleLogout = async () => {
     try {
       await firebase.auth().signOut();
@@ -203,12 +246,15 @@ const AdminDashboard = () => {
       setErrors({ general: "Failed to logout" });
     }
   };
+
+  // search users
   const filteredUsers = users.filter(
     (user) =>
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (user.displayName &&
         user.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
   return (
     <div className="min-h-screen bg-gray-50 flex font-sans">
       <div className="md:hidden fixed top-0 left-0 right-0 bg-primary p-4 flex justify-between items-center z-30 shadow-md">
@@ -220,7 +266,12 @@ const AdminDashboard = () => {
           className="text-white focus:outline-none"
           whileTap={{ scale: 0.9 }}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <AnimatePresence mode="wait">
               {isSidebarOpen ? (
                 <motion.path
@@ -251,9 +302,11 @@ const AdminDashboard = () => {
           </svg>
         </motion.button>
       </div>
+      {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 md:static w-64 bg-primary-dark text-white transition-transform duration-300 ease-in-out z-20 flex flex-col shadow-lg`}
+        className={`fixed inset-y-0 left-0 transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 md:static w-64 bg-primary-dark text-white transition-transform duration-300 ease-in-out z-20 flex flex-col shadow-lg`}
       >
         <div className="p-4 border-b border-primary">
           <h2 className="text-2xl font-bold font-heading text-center">
@@ -266,8 +319,11 @@ const AdminDashboard = () => {
               setActiveTab("users");
               setIsSidebarOpen(false);
             }}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium text-nowrap flex items-center ${activeTab === "users"
-              ? "bg-primary text-white hover:bg-primary/80" : "hover:bg-primary"}`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium text-nowrap flex items-center ${
+              activeTab === "users"
+                ? "bg-primary text-white hover:bg-primary/80"
+                : "hover:bg-primary"
+            }`}
             layout="activeTabIndicator"
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
@@ -280,10 +336,11 @@ const AdminDashboard = () => {
               setActiveTab("profile");
               setIsSidebarOpen(false);
             }}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium text-nowrap flex items-center ${activeTab === "profile"
-              ? "bg-primary text-white hover:bg-primary/80"
-              : "hover:bg-primary"
-              }`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium text-nowrap flex items-center ${
+              activeTab === "profile"
+                ? "bg-primary text-white hover:bg-primary/80"
+                : "hover:bg-primary"
+            }`}
             layout="activeTabIndicator"
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
@@ -300,6 +357,8 @@ const AdminDashboard = () => {
           </button>
         </div>
       </aside>
+
+      {/* content */}
       <main className="flex-1 md:ml-0 mt-16 md:mt-0">
         <header className="bg-white shadow-sm p-6 sticky top-0 md:top-0 z-10">
           <h1 className="text-2xl font-bold text-dark font-heading">
@@ -311,18 +370,22 @@ const AdminDashboard = () => {
           style={{ height: "calc(100vh - 80px)" }}
         >
           {success && (
-            <motion.div className="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-md shadow"
+            <motion.div
+              className="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-md shadow"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}>
+              exit={{ opacity: 0, x: -20 }}
+            >
               <p className="font-medium">{success}</p>
             </motion.div>
           )}
           {errors.general && (
-            <motion.div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-md shadow"
+            <motion.div
+              className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-md shadow"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}>
+              exit={{ opacity: 0, x: -20 }}
+            >
               <p className="font-medium">{errors.general}</p>
             </motion.div>
           )}
@@ -417,7 +480,8 @@ const AdminDashboard = () => {
                                 </div>
                                 <div className="ml-4">
                                   <div className="text-sm font-medium text-dark">
-                                    {user.displayName || user.email.split("@")[0]}
+                                    {user.displayName ||
+                                      user.email.split("@")[0]}
                                   </div>
                                 </div>
                               </div>
@@ -472,9 +536,11 @@ const AdminDashboard = () => {
 
                   <form onSubmit={handleProfileUpdate} className="space-y-6">
                     <div className="flex flex-col items-center space-y-4 mb-8">
-                      <motion.div className="relative"
+                      <motion.div
+                        className="relative"
                         whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}>
+                        whileTap={{ scale: 0.95 }}
+                      >
                         {profile.profileImage ? (
                           <motion.img
                             src={profile.profileImage}
@@ -485,14 +551,16 @@ const AdminDashboard = () => {
                             transition={{ duration: 0.5 }}
                           />
                         ) : (
-                          <motion.div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-primary-light border-4 border-primary-light flex items-center justify-center shadow-md"
+                          <motion.div
+                            className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-primary-light border-4 border-primary-light flex items-center justify-center shadow-md"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5 }}>
+                            transition={{ duration: 0.5 }}
+                          >
                             <span className="text-primary-dark text-4xl md:text-5xl font-bold font-heading">
                               {(
-                                profile.name?.charAt(0) ||
-                                profile.email?.charAt(0) ||
+                                profile.name.charAt(0) ||
+                                profile.email.charAt(0) ||
                                 "A"
                               ).toUpperCase()}
                             </span>
@@ -535,14 +603,17 @@ const AdminDashboard = () => {
                         onChange={(e) =>
                           setProfile({ ...profile, name: e.target.value })
                         }
-                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.name
-                          ? "border-red-500 focus:ring-red-300"
-                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                          }`}
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                          errors.name
+                            ? "border-red-500 focus:ring-red-300"
+                            : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                        }`}
                         placeholder="Your full name"
                       />
                       {errors.name && (
-                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.name}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -559,14 +630,17 @@ const AdminDashboard = () => {
                         onChange={(e) =>
                           setProfile({ ...profile, email: e.target.value })
                         }
-                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.email
-                          ? "border-red-500 focus:ring-red-300"
-                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                          }`}
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                          errors.email
+                            ? "border-red-500 focus:ring-red-300"
+                            : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                        }`}
                         placeholder="your.email@example.com"
                       />
                       {errors.email && (
-                        <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.email}
+                        </p>
                       )}
                     </div>
                     <hr className="my-6 border-gray-200" />
@@ -590,10 +664,11 @@ const AdminDashboard = () => {
                             currentPassword: e.target.value,
                           })
                         }
-                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.currentPassword
-                          ? "border-red-500 focus:ring-red-300"
-                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                          }`}
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                          errors.currentPassword
+                            ? "border-red-500 focus:ring-red-300"
+                            : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                        }`}
                         placeholder="Required for email/password changes"
                       />
                       {errors.currentPassword && (
@@ -615,12 +690,16 @@ const AdminDashboard = () => {
                         type="password"
                         value={profile.newPassword}
                         onChange={(e) =>
-                          setProfile({ ...profile, newPassword: e.target.value })
+                          setProfile({
+                            ...profile,
+                            newPassword: e.target.value,
+                          })
                         }
-                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.newPassword
-                          ? "border-red-500 focus:ring-red-300"
-                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                          }`}
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                          errors.newPassword
+                            ? "border-red-500 focus:ring-red-300"
+                            : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                        }`}
                         placeholder="new current password"
                       />
                       {errors.newPassword && (
@@ -646,10 +725,11 @@ const AdminDashboard = () => {
                             confirmPassword: e.target.value,
                           })
                         }
-                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.confirmPassword
-                          ? "border-red-500 focus:ring-red-300"
-                          : "border-gray-300 focus:ring-primary-light focus:border-primary"
-                          }`}
+                        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                          errors.confirmPassword
+                            ? "border-red-500 focus:ring-red-300"
+                            : "border-gray-300 focus:ring-primary-light focus:border-primary"
+                        }`}
                         placeholder="Confirm your new password"
                       />
                       {errors.confirmPassword && (
