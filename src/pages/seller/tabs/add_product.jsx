@@ -91,6 +91,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
         properties: []
     };
 
+    // state has 2 values or edit or not edit
     const [product, setProduct] = useState(initialProduct || defaultProductState);
 
     useEffect(() => {
@@ -152,7 +153,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
         }
     };
 
-    // Handle property addition
+    // Handle property adding
     const handleAddProperty = () => {
         if (newProperty.key.trim() && newProperty.value.trim()) {
             setProduct(prev => ({
@@ -232,7 +233,6 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
                 if (onSave) onSave(productData);
                 }
 
-
             } else {
                 const user = firebase.auth().currentUser;
                 productData.sellerId = user.uid;
@@ -259,6 +259,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
                         setSuccess('');
                         if (onSuccess) onSuccess()
                     }, 3000)
+                
                     setProduct({
                         name: '',
                         price: '',
