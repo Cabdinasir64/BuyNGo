@@ -59,6 +59,7 @@ export default function Signup() {
     });
     const [isLoading, setIsLoading] = useState(false);
 
+    //Chech unique if email or username used
     const checkUnique = async (field, value) => {
         const snapshot = await firebase
             .firestore()
@@ -68,6 +69,7 @@ export default function Signup() {
         return snapshot.empty;
     };
 
+    // validation from data
     const validate = async () => {
         let valid = true;
         const newErrors = { username: "", email: "", password: "" };
@@ -106,6 +108,7 @@ export default function Signup() {
         return valid;
     };
 
+    // handle form submit
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -136,6 +139,7 @@ export default function Signup() {
         }
     };
 
+    // creating facebook and google signup
     const handleSocialLogin = async (provider) => {
         try {
             setIsLoading(true);
