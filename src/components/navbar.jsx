@@ -121,6 +121,7 @@ const Navbar = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [userImage, SetUserImage] = useState(null)
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [cartTotal, setCartTotal] = useState(0);
@@ -128,28 +129,31 @@ const Navbar = () => {
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState("");
 
+  // user the current user login
   useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+    const stopListening = firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          const snapshot = await firebase
+          const doc = await firebase
             .firestore()
             .collection("users")
             .doc(user.uid)
             .get();
 
-          if (snapshot.exists) {
-            const data = snapshot.data();
+          if (doc.exists) {
+            const data = doc.data();
+            SetUserImage(data.profileImage)
             if (data.role !== "buyer") {
               navigate("/");
-              return; 
+              return;
             }
           }
-
           setUser(user);
-          fetchCartItems(user.uid);
         } catch (error) {
           setErrors({ general: "Error fetching user data:" });
+          setTimeout(() => {
+            setErrors({});
+          }, 3000);
         }
       } else {
         setUser(null);
@@ -157,12 +161,13 @@ const Navbar = () => {
       }
     });
 
-    return () => unsubscribe();
+    return () => stopListening();
   }, []);
 
+  // rending carts current user
   useEffect(() => {
     if (user) {
-      const unsubscribe = firebase
+      const stopListening = firebase
         .firestore()
         .collection("carts")
         .doc(user.uid)
@@ -182,41 +187,19 @@ const Navbar = () => {
           }
         });
 
-      return () => unsubscribe();
+      return () => stopListening();
     } else {
       setCartItems([]);
       setCartTotal(0);
     }
   }, [user]);
 
-  const fetchCartItems = async (userId) => {
-    try {
-      const cartRef = firebase.firestore().collection("carts").doc(userId);
-      const doc = await cartRef.get();
-      if (doc.exists) {
-        const cartData = doc.data();
-        const items = cartData.items || [];
-        setCartItems(items);
-        const totalItems = items.reduce(
-          (total, item) => total + item.quantity,
-          0
-        );
-        setCartTotal(totalItems);
-      } else {
-        setCartItems([]);
-        setCartTotal(0);
-      }
-    } catch (error) {
-      setErrors({ general: "Error fetching cart items.", error });
-    }
-  };
-
+  // rending products search
   useEffect(() => {
     if (query.trim() === "") {
       setResults([]);
       return;
     }
-
     const fetchProducts = async () => {
       setLoading(true);
       try {
@@ -242,10 +225,10 @@ const Navbar = () => {
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, [query]);
 
+  // product details
   const handleProductClick = (product) => {
     const slug = product.name
       .toLowerCase()
@@ -255,6 +238,7 @@ const Navbar = () => {
     setQuery("");
   };
 
+  // sign out user
   const handleSignOut = async () => {
     try {
       await firebase.auth().signOut();
@@ -299,15 +283,6 @@ const Navbar = () => {
       setIsMegaMenuOpen(false);
     }, 200);
   };
-
-  const handleMegaMenuMouseEnter = () => {
-    clearTimeout(megaMenuTimeoutRef.current);
-  };
-
-  const handleMegaMenuMouseLeave = () => {
-    setIsMegaMenuOpen(false);
-  };
-
   const closeMegaMenuAndMobile = () => {
     setIsMegaMenuOpen(false);
     if (isMenuOpen) {
@@ -350,7 +325,7 @@ const Navbar = () => {
     <motion.nav
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white shadow-md fixed left top-0 z-[999] w-full"
+      className="bg-white shadow-md fixed left-0 top-0 z-[999] w-full"
     >
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="flex justify-between items-center h-16">
@@ -382,6 +357,55 @@ const Navbar = () => {
                   <MdOutlineArrowDropDown size={28} />
                 </motion.span>
               </button>
+              <AnimatePresence mode="wait">
+                {isMegaMenuOpen && (
+                  <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="fixed left-0 right-0 w-screen top-[60px] bg-gray-50 shadow-xl border-t border-gray-200 z-20  max-h-[90vh] overflow-y-auto"
+                  >
+                    <div className="max-w-7xl px-6 py-8">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-x-6 gap-y-8">
+                        {categoriesData.map((category, catIndex) => (
+                          <motion.div
+                            key={catIndex}
+                            className="space-y-3"
+                            variants={categoryVariants}
+                          >
+                            <motion.h3
+                              className="text-md font-semibold text-primary mb-2 border-b-2 border-primary-light pb-2"
+                              variants={categoryVariants}
+                            >
+                              {category.name}
+                            </motion.h3>
+                            <ul className="space-y-1.5">
+                              {category.subcategories.map((sub, subIndex) => (
+                                <motion.li
+                                  key={subIndex}
+                                  variants={subcategoryVariants}
+                                  transition={{ delay: subIndex * 0.1 }}
+                                >
+                                  <Link
+                                    to={`/category/${generateSlug(
+                                      category.name
+                                    )}/${generateSlug(sub)}`}
+                                    className="block text-sm text-dark-muted hover:text-primary hover:underline"
+                                    onClick={closeMegaMenuAndMobile}
+                                  >
+                                    {sub}
+                                  </Link>
+                                </motion.li>
+                              ))}
+                            </ul>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             <Link
               to="/shopping"
@@ -428,7 +452,7 @@ const Navbar = () => {
                       >
                         <img
                           src={
-                            product.profileImage ||
+                            product.mainImage ||
                             "https://via.placeholder.com/50"
                           }
                           alt={product.name}
@@ -450,12 +474,14 @@ const Navbar = () => {
               >
                 {user ? (
                   <>
-                    {user.profileImage ? (
+                    {userImage ? (
+                      <div className="w-8 h-8">
                       <img
-                        src={user.profileImage}
+                        src={userImage}
                         alt="User"
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="w-full h-full rounded-full object-cover"
                       />
+                      </div>
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
                         {user.email.charAt(0).toUpperCase() || "U"}
@@ -540,58 +566,6 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-
-      <AnimatePresence mode="wait">
-        {isMegaMenuOpen && (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="absolute top-full left-0 right-0 w-full bg-gray-50 shadow-xl border-t border-gray-200 z-50"
-            onMouseEnter={handleMegaMenuMouseEnter}
-            onMouseLeave={handleMegaMenuMouseLeave}
-          >
-            <div className="max-w-7xl mx-auto px-6 py-8">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-x-6 gap-y-8">
-                {categoriesData.map((category, catIndex) => (
-                  <motion.div
-                    key={catIndex}
-                    className="space-y-3"
-                    variants={categoryVariants}
-                  >
-                    <motion.h3
-                      className="text-md font-semibold text-primary mb-2 border-b-2 border-primary-light pb-2"
-                      variants={categoryVariants}
-                    >
-                      {category.name}
-                    </motion.h3>
-                    <ul className="space-y-1.5">
-                      {category.subcategories.map((sub, subIndex) => (
-                        <motion.li
-                          key={subIndex}
-                          variants={subcategoryVariants}
-                          transition={{ delay: subIndex * 0.1 }}
-                        >
-                          <Link
-                            to={`/category/${generateSlug(
-                              category.name
-                            )}/${generateSlug(sub)}`}
-                            className="block text-sm text-dark-muted hover:text-primary hover:underline"
-                            onClick={closeMegaMenuAndMobile}
-                          >
-                            {sub}
-                          </Link>
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {success && (
         <motion.div
@@ -734,9 +708,9 @@ const Navbar = () => {
                     {user ? (
                       <div className="flex flex-col items-center space-y-2 w-full">
                         <div className="flex items-center space-x-2">
-                          {user.profileImage ? (
+                          {userImage ? (
                             <img
-                              src={user.profileImage}
+                              src={userImage}
                               alt="User"
                               className="w-8 h-8 rounded-full object-cover"
                             />
