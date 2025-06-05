@@ -62,6 +62,7 @@ const signin = () => {
                     if (snapshot.empty) {
                         throw new Error("Invalid email/username or password");
                     }
+                    
                     // when you get data signin with email
                     const userDoc = snapshot.docs[0].data();
                     userCredential = await firebase
