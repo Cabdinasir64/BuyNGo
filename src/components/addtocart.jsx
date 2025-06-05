@@ -7,6 +7,7 @@ function AddToCartButton({ product, user, className }) {
     const [errors, setErrors] = useState("");
     const [success, setSuccess] = useState("");
 
+    // Add to cart button
     const addToCart = async () => {
         if (!user) {
             setErrors("Please login to add to cart");
