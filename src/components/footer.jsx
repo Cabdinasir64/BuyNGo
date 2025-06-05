@@ -6,7 +6,7 @@ const Footer = () => {
         ">
             <div className="max-w-6xl mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    {/* BuyNGo Brand Section */}
+                    {/* BuyNGo Logo*/}
                     <div className="col-span-1">
                         <h3 className="text-xl font-bold mb-4 flex items-center">
                             <FaShoppingCart className="mr-2" />
