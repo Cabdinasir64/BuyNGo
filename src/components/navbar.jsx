@@ -751,7 +751,7 @@ const Navbar = () => {
                         </div>
                         <div className="flex space-x-4 w-full justify-center">
                           <Link
-                            to="/dashboard"
+                            to="/buyerdashboard"
                             className="text-sm text-dark hover:text-primary"
                             onClick={toggleMenu}
                           >
