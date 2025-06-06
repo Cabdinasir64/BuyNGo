@@ -235,10 +235,9 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
       setLoading(true);
       const productData = {
         ...product,
-        price: parseFloat(product.price),
+        price: Number(parseFloat(product.price).toFixed(2)),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       };
-
       if (initialProduct) {
         await firebase
           .firestore()
@@ -290,8 +289,6 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
           ? "Failed to update product"
           : "Failed to add product",
       });
-
-      console.log(error);
       setTimeout(() => {
         setErrors({});
       }, 3000);
@@ -314,7 +311,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
       {onCancel && (
         <button
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+          className="px-4 py-2 mb-4 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
         >
           Cancel
         </button>
