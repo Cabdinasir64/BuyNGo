@@ -81,11 +81,11 @@ const Product = () => {
     }, [productId]);
 
     useEffect(() => {
-        const unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
+        const stopListening = firebase.auth().onAuthStateChanged((firebaseUser) => {
             setUser(firebaseUser);
         });
 
-        return () => unsubscribe();
+        return () => stopListening();
     }, []);
 
     useEffect(() => {
