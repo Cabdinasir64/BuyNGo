@@ -68,7 +68,6 @@ const Cart = () => {
           if (item.productId === productId) {
             return { ...item, quantity: newQuantity };
           }
-          return item;
         });
 
         await cartRef.update({ items: updatedItems });
@@ -208,7 +207,7 @@ const Cart = () => {
                     className="bg-white rounded-xl shadow-sm overflow-hidden"
                   >
                     <AnimatePresence>
-                      {isDeleting !== item.id ? (
+                      {isDeleting !== item.productId ? (
                         <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
