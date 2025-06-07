@@ -76,7 +76,7 @@ const Checkout = () => {
         const list = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setAddresses(list);
 
-        if (list.length === 1) setSelectedAddress(list[0]);
+        if (list.length > 0) setSelectedAddress(list[0]);
       } catch (err) {
         setError("Failed to load checkout data. Please try again.");
         setTimeout(() => {
@@ -423,7 +423,7 @@ const Checkout = () => {
                   onChange={() => setSelectedAddress(addr)}
                   className="hidden"
                 />
-                <div className="flex items-start">
+                <div className="flex">
                   <div
                     className={`w-5 h-5 border rounded-full mt-1 mr-3 flex-shrink-0 ${
                       selectedAddress.id === addr.id
