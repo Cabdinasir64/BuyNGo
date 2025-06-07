@@ -11,11 +11,11 @@ function Product() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
+        const stopListening = firebase.auth().onAuthStateChanged((firebaseUser) => {
             setUser(firebaseUser);
         });
 
-        return () => unsubscribe();
+        return () => stopListening();
     }, []);
 
     useEffect(() => {
@@ -168,7 +168,7 @@ function Product() {
             </div>
             {/* Mobile Carousel */}
             <div className="md:hidden relative">
-                <div className="flex overflow-x-auto pb-6 scrollbar-hide space-x-4">
+                <div className="flex overflow-x-auto pb-6 space-x-4">
                     <AnimatePresence>
                         {loading ? (
                             Array(3).fill(0).map((_, idx) => (
@@ -191,7 +191,6 @@ function Product() {
                                         damping: 10
                                     }}
                                     layout
-                                    onClick={() => handleProductClick(product)}
                                 >
                                     <div className="relative">
                                         <motion.img
@@ -201,6 +200,7 @@ function Product() {
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             transition={{ delay: 0.2 }}
+                                            onClick={() => handleProductClick(product)}
                                         />
                                         {product.isNew && (
                                             <motion.div
