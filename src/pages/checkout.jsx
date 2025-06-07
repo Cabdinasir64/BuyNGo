@@ -50,9 +50,14 @@ const Checkout = () => {
           .doc(user.uid)
           .get();
         if (cartDoc.exists) {
-          const items = cartDoc.data().items || [];
-          setCartItems(items);
+          let items = cartDoc.data().items || [];
 
+          items = items.map((item) => ({
+            ...item,
+            id: item.id || uuidv4(), 
+          }));
+
+          setCartItems(items);
           if (items.length > 0) {
             setSellerId(items[0].sellerId);
           } else {
@@ -108,9 +113,7 @@ const Checkout = () => {
     setSuccess("");
 
     try {
-      const orderRef = firebase.firestore().collection("orders").doc();
-      await orderRef.set({
-        id: orderRef.id,
+      await firebase.firestore().collection("orders").add({
         sellerId: sellerId,
         buyerId: user.uid,
         items: cartItems,
