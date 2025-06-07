@@ -54,7 +54,7 @@ const Checkout = () => {
 
           items = items.map((item) => ({
             ...item,
-            id: item.id || uuidv4(), 
+            id: cartDoc.id, 
           }));
 
           setCartItems(items);
