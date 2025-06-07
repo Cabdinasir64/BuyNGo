@@ -54,7 +54,7 @@ const Checkout = () => {
 
           items = items.map((item) => ({
             ...item,
-            id: cartDoc.id, 
+            id: cartDoc.id,
           }));
 
           setCartItems(items);
@@ -89,7 +89,7 @@ const Checkout = () => {
     };
 
     fetchData();
-  }, [navigate]);
+  }, []);
 
   const getTotal = () =>
     cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -459,7 +459,6 @@ const Checkout = () => {
       >
         <button
           onClick={handlePlaceOrder}
-          hidden={placingOrder || !selectedAddress}
           className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-medium transition flex items-center justify-center gap-2"
         >
           {placingOrder ? "Placing Order..." : "Place Order"}
