@@ -16,7 +16,7 @@ const Category = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
-  const productsPerPage = 5;
+  const productsPerPage = 12;
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -171,7 +171,7 @@ const Category = () => {
           ))}
         </div>
 
-        {totalPages > 0 && (
+        {totalPages > 1 && (
           <div className="flex justify-center items-center gap-2 mt-8 pb-24">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
