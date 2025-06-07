@@ -121,7 +121,7 @@ const Navbar = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const [userImage, SetUserImage] = useState(null)
+  const [userImage, SetUserImage] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [cartTotal, setCartTotal] = useState(0);
@@ -142,7 +142,7 @@ const Navbar = () => {
 
           if (doc.exists) {
             const data = doc.data();
-            SetUserImage(data.profileImage)
+            SetUserImage(data.profileImage);
             if (data.role !== "buyer") {
               navigate("/");
               return;
@@ -476,11 +476,11 @@ const Navbar = () => {
                   <>
                     {userImage ? (
                       <div className="w-8 h-8">
-                      <img
-                        src={userImage}
-                        alt="User"
-                        className="w-full h-full rounded-full object-cover"
-                      />
+                        <img
+                          src={userImage}
+                          alt="User"
+                          className="w-full h-full rounded-full object-cover"
+                        />
                       </div>
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
