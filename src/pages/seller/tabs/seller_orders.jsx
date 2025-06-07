@@ -44,39 +44,28 @@ const SellerOrdersTab = () => {
   const handleUpdateStatus = async (orderId, newStatus) => {
     setProcessing(orderId);
     try {
-      const doc = await firebase
-        .firestore()
-        .collection("orders")
-        .where("id", "==", orderId)
-        .limit(1)
-        .get();
+      const docRef = firebase.firestore().collection("orders").doc(orderId);
+      const docSnap = await docRef.get();
 
-      if (doc.empty) {
+      if (!docSnap.exists) {
         setError("Order not found.");
         setProcessing(null);
-        setTimeout(() => {
-          setError("");
-        }, 3000);
+        setTimeout(() => setError(""), 3000);
         return;
       }
 
-      const docRef = doc.docs[0].ref;
       await docRef.update({
         status: newStatus,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
+
       setSuccess(`Order ${newStatus}d successfully.`);
-      setTimeout(() => {
-        setSuccess("");
-      }, 3000);
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(`Failed to ${newStatus} order`);
-      setTimeout(() => {
-        setError("");
-      }, 3000);
+      setTimeout(() => setError(""), 3000);
     } finally {
       setProcessing(null);
-      console.log("Updating order:", orderId);
     }
   };
 
@@ -85,28 +74,22 @@ const SellerOrdersTab = () => {
 
     setProcessing(orderId);
     try {
-      const doc = await firebase
-        .firestore()
-        .collection("orders")
-        .where("id", "==", orderId)
-        .limit(1)
-        .get();
+      const docRef = firebase.firestore().collection("orders").doc(orderId);
+      const docSnap = await docRef.get();
 
-      if (doc.empty) {
+      if (!docSnap.exists) {
         setError("Order not found.");
         setProcessing(null);
         setTimeout(() => setError(""), 3000);
         return;
       }
 
-      const docRef = doc.docs[0].ref;
       await docRef.delete();
 
-      setSuccess(`Order deleted successfully.`);
+      setSuccess("Order deleted successfully.");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError("Failed to delete order");
-      console.error(err);
       setTimeout(() => setError(""), 3000);
     } finally {
       setProcessing(null);
@@ -204,7 +187,7 @@ const SellerOrdersTab = () => {
                     <p>
                       {order.address.state}, {order.address.country}
                     </p>
-                    <p>Name:{order.address.fullName}</p>
+                    <p>Name: {order.address.fullName}</p>
                     <p>Phone: {order.address.phone}</p>
                   </div>
                   <div className="text-right">
