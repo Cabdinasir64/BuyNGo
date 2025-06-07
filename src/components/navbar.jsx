@@ -306,6 +306,11 @@ const Navbar = () => {
       opacity: 0,
       y: -15,
       height: 0,
+      transition: {
+        duration: 0.3,
+        when: "afterChildren",
+        staggerChildren: 0.05,
+      }
     },
   };
 
