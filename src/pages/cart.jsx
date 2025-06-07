@@ -128,7 +128,6 @@ const Cart = () => {
       const timer = setTimeout(() => {
         setSuccessMessage("");
         setErrorMessage("");
-        console.log(cartItems);
       }, 3000);
       return () => clearTimeout(timer);
     }
