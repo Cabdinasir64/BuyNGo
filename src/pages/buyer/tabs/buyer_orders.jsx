@@ -3,7 +3,7 @@ import firebase from "/firebase";
 import { motion } from "framer-motion";
 import { FaCheck, FaTimes, FaShoppingBag } from "react-icons/fa";
 
-const BuyersOrdersTab = () => {
+const BuyerOrdersTab = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -62,7 +62,7 @@ const BuyersOrdersTab = () => {
         status: "cancelled",
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
-      setSuccess(`Order cancelled successfully.`);
+      setSuccess(`Order cancel successfully.`);
       setTimeout(() => {
         setSuccess("");
         setError("");
@@ -77,17 +77,6 @@ const BuyersOrdersTab = () => {
     } finally {
       setProcessing(null);
     }
-  };
-
-  const groupItemsBySeller = (items) => {
-    const grouped = {};
-    items.forEach((item) => {
-      if (!grouped[item.sellerId]) {
-        grouped[item.sellerId] = [];
-      }
-      grouped[item.sellerId].push(item);
-    });
-    return grouped;
   };
 
   if (loading) {
@@ -159,45 +148,17 @@ const BuyersOrdersTab = () => {
 
               <div className="p-4">
                 <div className="mb-4">
-                  <h4 className="font-medium mb-2">Items by Seller:</h4>
-
-                  {Object.entries(groupItemsBySeller(order.items)).map(
-                    ([sellerId, items], idx) => (
-                      <div
-                        key={idx}
-                        className="mb-4 p-4 border rounded bg-gray-50"
-                      >
-                        <h5 className="text-sm font-semibold mb-2">
-                          Seller: <span className="font-mono">{sellerId}</span>
-                        </h5>
-                        <ul className="space-y-1 text-sm">
-                          {items.map((item, i) => (
-                            <li
-                              key={i}
-                              className="flex justify-between text-gray-700"
-                            >
-                              <span>
-                                {item.name} x {item.quantity}
-                              </span>
-                              <span>
-                                ${(item.price * item.quantity).toFixed(2)}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="text-right font-medium mt-2">
-                          Subtotal: $
-                          {items
-                            .reduce(
-                              (sum, item) =>
-                                sum + item.price * item.quantity,
-                              0
-                            )
-                            .toFixed(2)}
-                        </div>
-                      </div>
-                    )
-                  )}
+                  <h4 className="font-medium mb-2">Items:</h4>
+                  <ul className="space-y-2">
+                    {order.items.map((item, index) => (
+                      <li key={index} className="flex justify-between">
+                        <span>
+                          {item.name} x {item.quantity}
+                        </span>
+                        <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
                 <div className="flex justify-between border-t pt-3">
@@ -244,4 +205,4 @@ const BuyersOrdersTab = () => {
   );
 };
 
-export default BuyersOrdersTab;
+export default BuyerOrdersTab;
