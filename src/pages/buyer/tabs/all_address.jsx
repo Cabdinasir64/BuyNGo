@@ -105,7 +105,6 @@ const AllAddressTab = ({ onEmpty }) => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Your Addresses</h2>
         <button
-          onClick={() => navigate('/seller-dashboard?tab=add_address')}
           className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg"
         >
           <FaPlus /> Add New Address
