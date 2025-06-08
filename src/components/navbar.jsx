@@ -310,7 +310,7 @@ const Navbar = () => {
         duration: 0.3,
         when: "afterChildren",
         staggerChildren: 0.05,
-      }
+      },
     },
   };
 
