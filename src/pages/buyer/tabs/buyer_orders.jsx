@@ -23,7 +23,7 @@ const PurchaseOrders = () => {
                     const ordersData = snapshot.docs.map(doc => ({
                         id: doc.id,
                         ...doc.data(),
-                        createdAt: doc.data().createdAt?.toDate()
+                        createdAt: doc.data().createdAt.toDate()
                     }));
                     setOrders(ordersData);
                     setLoading(false);
@@ -124,7 +124,7 @@ const PurchaseOrders = () => {
                                 <div>
                                     <h3 className="font-bold">Order #{order.id.substring(0, 8)}</h3>
                                     <p className="text-sm text-gray-500">
-                                        {order.createdAt?.toLocaleDateString()} at {order.createdAt?.toLocaleTimeString()}
+                                        {order.createdAt.toLocaleDateString()} at {order.createdAt.toLocaleTimeString()}
                                     </p>
                                 </div>
                                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'confirmed' ? 'bg-green-100 text-green-800' : order.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
