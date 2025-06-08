@@ -17,15 +17,27 @@ const SellerOrdersTab = () => {
     const stopListening = firebase
       .firestore()
       .collection("orders")
-      .where("sellerId", "==", user.uid)
       .orderBy("createdAt", "desc")
       .onSnapshot(
         (snapshot) => {
-          const ordersData = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            createdAt: doc.data().createdAt?.toDate(),
-          }));
+          const ordersData = snapshot.docs
+            .map((doc) => {
+              const data = doc.data();
+              const sellerItems = data.items?.filter(
+                (item) => item.sellerId === user.uid
+              );
+
+              if (!sellerItems || sellerItems.length === 0) return null;
+
+              return {
+                id: doc.id,
+                ...data,
+                items: sellerItems,
+                createdAt: data.createdAt?.toDate(),
+              };
+            })
+            .filter(Boolean); 
+
           setOrders(ordersData);
           setLoading(false);
         },
