@@ -170,6 +170,7 @@ const BuyerOrdersTab = () => {
                     <p>
                       {order.address.state}, {order.address.country}
                     </p>
+                    <p>Name: {order.address.fullName}</p>
                     <p>Phone: {order.address.phone}</p>
                   </div>
                   <div className="text-right">
