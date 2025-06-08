@@ -68,6 +68,7 @@ const Cart = () => {
           if (item.productId === productId) {
             return { ...item, quantity: newQuantity };
           }
+          return item;
         });
 
         await cartRef.update({ items: updatedItems });
