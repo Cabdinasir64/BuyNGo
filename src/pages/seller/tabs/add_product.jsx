@@ -121,7 +121,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
     } else {
       setProduct(defaultProductState);
     }
-  }, [initialProduct]);
+  }, []);
 
   const [newProperty, setNewProperty] = useState({ key: "", value: "" });
   const [errors, setErrors] = useState({});
@@ -155,7 +155,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
         if (data.secure_url) {
           uploadedImages.push(data.secure_url);
         } else {
-          throw new Error(data.error?.message || "Cloudinary upload failed");
+          throw new Error(data.error.message || "Cloudinary upload failed");
         }
       }
 
@@ -252,9 +252,8 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
         const duplicateCheck = await firebase
           .firestore()
           .collection("products")
-          .where("sellerId", "==", user.uid)
           .where("name", "==", productData.name)
-          .where("category", "==", productData.category)
+          .where("description", "==", productData.description)
           .get();
 
         if (!duplicateCheck.empty) {
