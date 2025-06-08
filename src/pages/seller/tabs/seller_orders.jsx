@@ -23,7 +23,7 @@ const SellerOrdersTab = () => {
           const ordersData = snapshot.docs
             .map((doc) => {
               const data = doc.data();
-              const sellerItems = data.items?.filter(
+              const sellerItems = data.items.filter(
                 (item) => item.sellerId === user.uid
               );
 
