@@ -21,7 +21,7 @@ const AddAddressTab = ({ initialAddress, onSave, onCancel, onSuccess }) => {
 
   useEffect(() => {
     setForm(initialAddress || defaultState);
-  }, [initialAddress]);
+  }, []);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
