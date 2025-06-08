@@ -29,7 +29,6 @@ const SellerOrdersTab = () => {
 
               if (!sellerItems || sellerItems.length === 0) return null;
 
-            
               const sellerTotal = sellerItems.reduce(
                 (sum, item) => sum + item.price * item.quantity,
                 0
@@ -38,8 +37,8 @@ const SellerOrdersTab = () => {
               return {
                 id: doc.id,
                 ...data,
-                items: sellerItems, 
-                total: sellerTotal, 
+                items: sellerItems,
+                total: sellerTotal,
                 createdAt: data.createdAt?.toDate(),
               };
             })
@@ -89,7 +88,12 @@ const SellerOrdersTab = () => {
   };
 
   const handleDeleteOrder = async (orderId) => {
-    if (!window.confirm("Are you sure you want to delete this order?")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete your items from this order?"
+      )
+    )
+      return;
 
     setProcessing(orderId);
     try {
@@ -103,12 +107,27 @@ const SellerOrdersTab = () => {
         return;
       }
 
-      await docRef.delete();
+      const data = docSnap.data();
+      const user = firebase.auth().currentUser;
 
-      setSuccess("Order deleted successfully.");
+
+      const updatedItems = data.items.filter(
+        (item) => item.sellerId !== user.uid
+      );
+
+      if (updatedItems.length === 0) {
+        await docRef.delete();
+      } else {
+        await docRef.update({
+          items: updatedItems,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+
+      setSuccess("Your order items deleted successfully.");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError("Failed to delete order");
+      setError("Failed to delete your order items");
       setTimeout(() => setError(""), 3000);
     } finally {
       setProcessing(null);
