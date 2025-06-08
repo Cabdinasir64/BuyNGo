@@ -29,7 +29,7 @@ const SellerOrdersTab = () => {
 
               if (!sellerItems || sellerItems.length === 0) return null;
 
-              // ✅ Xisaabi total-ka seller-ka kaliya
+            
               const sellerTotal = sellerItems.reduce(
                 (sum, item) => sum + item.price * item.quantity,
                 0
@@ -38,12 +38,12 @@ const SellerOrdersTab = () => {
               return {
                 id: doc.id,
                 ...data,
-                items: sellerItems, // Seller-specific items
-                total: sellerTotal, // Seller-specific total
+                items: sellerItems, 
+                total: sellerTotal, 
                 createdAt: data.createdAt?.toDate(),
               };
             })
-            .filter(Boolean); // Ka saar kuwa null ah
+            .filter(Boolean);
 
           setOrders(ordersData);
           setLoading(false);
