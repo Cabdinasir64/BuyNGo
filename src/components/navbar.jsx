@@ -144,6 +144,7 @@ const Navbar = () => {
             const data = doc.data();
             SetUserImage(data.profileImage);
             if (data.role !== "buyer") {
+              await firebase.auth().signOut();
               navigate("/");
               return;
             }
