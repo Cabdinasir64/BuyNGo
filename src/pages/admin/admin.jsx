@@ -502,6 +502,7 @@ const AdminDashboard = () => {
                               >
                                 <option value="buyer">Buyer</option>
                                 <option value="seller">Seller</option>
+                                <option value="admin">Admin</option>
                               </select>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
