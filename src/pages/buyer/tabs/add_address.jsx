@@ -221,7 +221,6 @@ const AddAddressTab = ({ initialAddress, onSave, onCancel, onSuccess }) => {
             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             <option value="Somalia">Somalia</option>
-            <option value="Other">Other</option>
           </select>
         </div>
 
