@@ -564,7 +564,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
                 <img
                   src={selectedImage}
                   alt="Preview"
-                  className="w-full h-auto object-contain rounded-md max-h-[calc(80vh-60px)]"
+                  className="w-full h-auto object-cover rounded-md max-h-[calc(80vh-60px)]"
                 />
                 <button
                   className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition"
