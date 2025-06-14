@@ -42,7 +42,7 @@ const SellerOrdersTab = () => {
                 createdAt: data.createdAt?.toDate(),
               };
             })
-            .filter(Boolean);
+            .filter((order) => order != null);
 
           setOrders(ordersData);
           setLoading(false);
@@ -109,7 +109,6 @@ const SellerOrdersTab = () => {
 
       const data = docSnap.data();
       const user = firebase.auth().currentUser;
-
 
       const updatedItems = data.items.filter(
         (item) => item.sellerId !== user.uid
