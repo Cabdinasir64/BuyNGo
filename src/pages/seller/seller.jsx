@@ -37,8 +37,6 @@ const SellerDashboard = () => {
         return <ProfileTab />;
       case "orders":
         return <OrdersTab />;
-
-      case "products":
       default:
         return null;
     }
@@ -110,11 +108,7 @@ const SellerDashboard = () => {
           <div className="relative">
             <motion.button
               onClick={() => setIsProductsOpen(!isProductsOpen)}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${
-                activeTab.startsWith("products")
-                  ? "bg-primary text-white hover:bg-primary/80"
-                  : "hover:bg-primary"
-              }`}
+              className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 hover:bg-primary`}
               layout="activeTabIndicator"
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             >
