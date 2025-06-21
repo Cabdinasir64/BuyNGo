@@ -156,50 +156,49 @@ export default function Signup() {
   const handleSocialLogin = async (provider) => {
     try {
       setIsLoading(true);
-      let authProvider;
+      setError("");
 
-      if (provider === "google") {
-        authProvider = googleProvider;
-      } else {
-        authProvider = facebookProvider;
-      }
-
+      const authProvider = provider === "google" ? googleProvider : facebookProvider;
       const { user } = await firebase.auth().signInWithPopup(authProvider);
 
-      const snapshot = await firebase
-        .firestore()
-        .collection("users")
-        .where("email", "==", user.email)
-        .get();
+      const userRef = firebase.firestore().collection("users").doc(user.uid);
+      const userDoc = await userRef.get();
 
-      if (snapshot.empty) {
-        await firebase
-          .firestore()
-          .collection("users")
-          .doc(user.uid)
-          .set({
-            username: user.displayName || user.email.split("@")[0],
-            email: user.email,
-            role: "buyer",
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-          });
-      } else {
-        setError(
-          "This Google accuont is already registerd. Please sign in with your Google account."
-        );
-        await firebase.auth().signOut();
-        return;
+      if (!userDoc.exists) {
+        await userRef.set({
+          username: user.displayName || user.email.split("@")[0],
+          email: user.email,
+          role: "buyer",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        return navigate("/");
       }
 
-      navigate("/");
+      await userRef.update({
+        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+
+      const userData = userDoc.data();
+      switch (userData.role) {
+        case "admin":
+          navigate("/admindashboard");
+          break;
+        case "seller":
+          navigate("/sellerdashboard");
+          break;
+        default:
+          navigate("/");
+      }
+
     } catch (err) {
       if (err.code === "auth/account-exists-with-different-credential") {
-        setError(
-          "This email is already registerd with a differnt login method."
-        );
+        setError("This email is already registerd with a differnt login method. Try signing in with email/password.");
+      } else if (err.code === "auth/popup-closed-by-user") {
+        setError("Login popup was closed. Please try again.");
+      } else if (err.code === "auth/cancelled-popup-request") {
       } else {
-        setError(err.message);
+        setError(err.message || "Failed to sign in. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -237,11 +236,10 @@ export default function Signup() {
                   setFormData({ ...formData, username: e.target.value });
                   setErrors({ ...errors, username: "" });
                 }}
-                className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${
-                  errors.username
-                    ? "border-accent-red focus:ring-accent-red/30"
-                    : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
-                }`}
+                className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${errors.username
+                  ? "border-accent-red focus:ring-accent-red/30"
+                  : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
+                  }`}
                 placeholder="Username"
                 autoComplete="username"
               />
@@ -266,11 +264,10 @@ export default function Signup() {
                   setFormData({ ...formData, email: e.target.value });
                   setErrors({ ...errors, email: "" });
                 }}
-                className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${
-                  errors.email
-                    ? "border-accent-red focus:ring-accent-red/30"
-                    : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
-                }`}
+                className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${errors.email
+                  ? "border-accent-red focus:ring-accent-red/30"
+                  : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
+                  }`}
                 placeholder="Name@example.com"
                 autoComplete="email"
               />
@@ -293,11 +290,10 @@ export default function Signup() {
                   setFormData({ ...formData, password: e.target.value });
                   setErrors({ ...errors, password: "" });
                 }}
-                className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${
-                  errors.password
-                    ? "border-accent-red focus:ring-accent-red/30"
-                    : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
-                }`}
+                className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${errors.password
+                  ? "border-accent-red focus:ring-accent-red/30"
+                  : "border-gray-300 focus:border-primary-DEFAULT focus:ring-primary-light/50"
+                  }`}
                 placeholder="••••••••"
                 autoComplete="new-password"
               />
@@ -309,11 +305,10 @@ export default function Signup() {
             </div>
             <button
               type="submit"
-              className={`w-full py-3 px-4 rounded-lg font-medium bg-primary-dark text-white transition-colors ${
-                isLoading
-                  ? "bg-primary-light cursor-not-allowed"
-                  : "hover:bg-primary-dark/80"
-              }`}
+              className={`w-full py-3 px-4 rounded-lg font-medium bg-primary-dark text-white transition-colors ${isLoading
+                ? "bg-primary-light cursor-not-allowed"
+                : "hover:bg-primary-dark/80"
+                }`}
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
