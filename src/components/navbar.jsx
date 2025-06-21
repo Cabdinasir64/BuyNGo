@@ -331,7 +331,7 @@ const Navbar = () => {
     <motion.nav
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white shadow-md fixed left-0 top-0 z-[999] w-full"
+      className="bg-white shadow-md fixed left-0 top-0 z-40 w-full"
     >
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="flex justify-between items-center h-16">

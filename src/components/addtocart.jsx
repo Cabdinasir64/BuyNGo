@@ -87,7 +87,7 @@ function AddToCartButton({ product, user, className }) {
                 {success && (
                     <motion.div
                         key="success"
-                        className="mb-4 p-3 bg-green-100 text-accent-green rounded-md border border-accent-green absolute top-[70px] z-40 left-[0px]"
+                        className="mb-4 p-3 bg-green-100 text-accent-green rounded-md border border-accent-green fixed top-[70px] z-999 left-[0px]"
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
@@ -101,7 +101,7 @@ function AddToCartButton({ product, user, className }) {
                 {errors && (
                     <motion.div
                         key="error"
-                        className="mb-4 p-3 bg-red-100 text-accent-red rounded-md border border-accent-red absolute top-[70px] z-40 left-[0px]"
+                        className="mb-4 p-3 bg-red-100 text-accent-red rounded-md border border-accent-red fixed top-[70px] z-999 left-[0px]"
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
