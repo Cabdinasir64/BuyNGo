@@ -184,10 +184,23 @@ export default function Signup() {
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
           });
+      } else {
+        setError(
+          "This Google accuont is already registerd. Please sign in with your Google account."
+        );
+        await firebase.auth().signOut();
+        return;
       }
+
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      if (err.code === "auth/account-exists-with-different-credential") {
+        setError(
+          "This email is already registerd with a differnt login method."
+        );
+      } else {
+        setError(err.message);
+      }
     } finally {
       setIsLoading(false);
     }
