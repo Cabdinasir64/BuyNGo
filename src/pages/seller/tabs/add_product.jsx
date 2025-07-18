@@ -121,7 +121,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
       setProduct({
         ...defaultProductState,
         ...initialProduct,
-        quantity: initialProduct.quantity ?? 0,
+        quantity: initialProduct.quantity ?? 1,
       });
     } else {
       setProduct(defaultProductState);
