@@ -56,11 +56,15 @@ const Cart = () => {
   // syncing cart with products stock
   useEffect(() => {
     const syncCartWithStock = async () => {
-      if (!user || cartItems.length === 0) return;
+      if (!user) return;
+
+      const cartRef = firebase.firestore().collection("carts").doc(user.uid);
+      const cartDoc = await cartRef.get();
+      const items = cartDoc.exists ? cartDoc.data().items || [] : [];
 
       const updatedItems = [];
 
-      for (const item of cartItems) {
+      for (const item of items) {
         const productDoc = await firebase.firestore().collection("products").doc(item.productId).get();
 
         if (productDoc.exists) {
@@ -68,23 +72,18 @@ const Cart = () => {
           const stock = product.quantity || 0;
 
           if (stock === 0) continue;
-          if (item.quantity > stock) {
-            updatedItems.push({ ...item, quantity: stock });
-          } else {
-            updatedItems.push(item);
-          }
+          const newQty = Math.min(item.quantity, stock);
+          updatedItems.push({ ...item, quantity: newQty });
         }
       }
 
-      await firebase.firestore().collection("carts").doc(user.uid).update({
-        items: updatedItems,
-      });
-
+      await cartRef.update({ items: updatedItems });
       setCartItems(updatedItems);
     };
 
     syncCartWithStock();
-  }, [user, cartItems]);
+  }, [user]); // ❗️Only depends on user
+
 
 
   // updating cart quantity
