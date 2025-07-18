@@ -82,9 +82,9 @@ function AddToCartButton({ product, user, className }) {
             <button
                 onClick={addToCart}
                 className={className || ""}
-                disabled={product.stock === 0}
+                disabled={product.quantity === 0}
             >
-                {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                {product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
             </button>
 
             <AnimatePresence>
