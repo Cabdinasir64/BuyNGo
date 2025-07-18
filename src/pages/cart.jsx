@@ -144,7 +144,7 @@ const Cart = () => {
       const timer = setTimeout(() => {
         setSuccessMessage("");
         setErrorMessage("");
-      }, 3000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [successMessage, errorMessage]);
