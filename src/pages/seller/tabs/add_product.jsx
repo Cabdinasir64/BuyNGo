@@ -118,11 +118,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
 
   useEffect(() => {
     if (initialProduct) {
-      setProduct({
-        ...defaultProductState,
-        ...initialProduct,
-        quantity: initialProduct.quantity ?? 1,
-      });
+      setProduct(initialProduct);
     } else {
       setProduct(defaultProductState);
     }
