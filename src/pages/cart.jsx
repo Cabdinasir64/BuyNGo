@@ -53,6 +53,40 @@ const Cart = () => {
     return () => stopListening();
   }, []);
 
+  // syncing cart with products stock
+  useEffect(() => {
+    const syncCartWithStock = async () => {
+      if (!user || cartItems.length === 0) return;
+
+      const updatedItems = [];
+
+      for (const item of cartItems) {
+        const productDoc = await firebase.firestore().collection("products").doc(item.productId).get();
+
+        if (productDoc.exists) {
+          const product = productDoc.data();
+          const stock = product.quantity || 0;
+
+          if (stock === 0) continue;
+          if (item.quantity > stock) {
+            updatedItems.push({ ...item, quantity: stock });
+          } else {
+            updatedItems.push(item);
+          }
+        }
+      }
+
+      await firebase.firestore().collection("carts").doc(user.uid).update({
+        items: updatedItems,
+      });
+
+      setCartItems(updatedItems);
+    };
+
+    syncCartWithStock();
+  }, [user, cartItems]);
+
+
   // updating cart quantity
   const updateQuantity = async (productId, newQuantity) => {
     if (newQuantity < 1 || !user) return;
