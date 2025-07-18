@@ -9,6 +9,12 @@ function AddToCartButton({ product, user, className }) {
 
     // Add to cart button
     const addToCart = async () => {
+        if (product.quantity === 0) {
+            setErrors("Out of stock");
+            setSuccess("");
+            clearMessages();
+            return;
+        }
         if (!user) {
             setErrors("Please login to add to cart");
             setSuccess("");
@@ -75,12 +81,10 @@ function AddToCartButton({ product, user, className }) {
         <>
             <button
                 onClick={addToCart}
-                className={
-                    className ||
-                    ""
-                }
+                className={className || ""}
+                disabled={product.stock === 0}
             >
-                Add to Cart
+                {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
             </button>
 
             <AnimatePresence>
