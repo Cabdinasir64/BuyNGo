@@ -55,34 +55,44 @@ const Cart = () => {
 
   // syncing cart with products stock
   useEffect(() => {
-    const syncCartWithStock = async () => {
-      if (!user) return;
+    if (!user) return;
 
-      const cartRef = firebase.firestore().collection("carts").doc(user.uid);
-      const cartDoc = await cartRef.get();
-      const items = cartDoc.exists ? cartDoc.data().items || [] : [];
+    const stopListening = firebase
+      .firestore()
+      .collection("carts")
+      .doc(user.uid)
+      .onSnapshot(async (doc) => {
+        const items = doc.exists ? doc.data().items || [] : [];
+        const updatedItems = [];
 
-      const updatedItems = [];
+        for (const item of items) {
+          const productDoc = await firebase
+            .firestore()
+            .collection("products")
+            .doc(item.productId)
+            .get();
 
-      for (const item of items) {
-        const productDoc = await firebase.firestore().collection("products").doc(item.productId).get();
+          if (productDoc.exists) {
+            const product = productDoc.data();
+            const stock = product.quantity || 0;
 
-        if (productDoc.exists) {
-          const product = productDoc.data();
-          const stock = product.quantity || 0;
-
-          if (stock === 0) continue;
-          const newQty = Math.min(item.quantity, stock);
-          updatedItems.push({ ...item, quantity: newQty });
+            if (stock === 0) continue;
+            const newQty = Math.min(item.quantity, stock);
+            updatedItems.push({ ...item, quantity: newQty });
+          }
         }
-      }
+        await firebase
+          .firestore()
+          .collection("carts")
+          .doc(user.uid)
+          .update({ items: updatedItems });
 
-      await cartRef.update({ items: updatedItems });
-      setCartItems(updatedItems);
-    };
+        setCartItems(updatedItems);
+      });
 
-    syncCartWithStock();
-  }, [user]); // ❗️Only depends on user
+    return () => stopListening();
+  }, [user]);
+
 
 
 
