@@ -113,6 +113,27 @@ const Checkout = () => {
     setSuccess("");
 
     try {
+      // 1. Update stock for each product one by one
+      for (const item of cartItems) {
+        const productRef = firebase.firestore().collection("products").doc(item.productId);
+        const productDoc = await productRef.get();
+
+        if (!productDoc.exists) {
+          throw new Error(`Product ${item.name} does not exist.`);
+        }
+
+        const currentStock = productDoc.data().stock;
+
+        if (currentStock < item.quantity) {
+          throw new Error(`Insufficient stock for product ${item.name}.`);
+        }
+
+        await productRef.update({
+          stock: currentStock - item.quantity,
+        });
+      }
+
+      // 2. Add order document
       await firebase.firestore().collection("orders").add({
         sellerId: sellerId,
         buyerId: user.uid,
@@ -123,6 +144,7 @@ const Checkout = () => {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
 
+      // 3. Clear the cart
       await firebase.firestore().collection("carts").doc(user.uid).delete();
 
       setSuccess("Order placed successfully!");
@@ -131,7 +153,7 @@ const Checkout = () => {
         navigate("/");
       }, 2000);
     } catch (error) {
-      setError("Failed to place order. Please try again.");
+      setError(error.message || "Failed to place order. Please try again.");
       setTimeout(() => {
         setSuccess("");
         setError("");
@@ -140,6 +162,7 @@ const Checkout = () => {
       setPlacingOrder(false);
     }
   };
+
 
   const handleAddressChange = (e) => {
     setNewAddress((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -409,11 +432,10 @@ const Checkout = () => {
             {addresses.map((addr) => (
               <label
                 key={addr.id}
-                className={`block border p-4 rounded-lg cursor-pointer transition ${
-                  selectedAddress.id === addr.id
+                className={`block border p-4 rounded-lg cursor-pointer transition ${selectedAddress.id === addr.id
                     ? "border-primary bg-primary/10"
                     : "border-gray-200 hover:border-primary"
-                }`}
+                  }`}
               >
                 <input
                   type="radio"
@@ -425,11 +447,10 @@ const Checkout = () => {
                 />
                 <div className="flex">
                   <div
-                    className={`w-5 h-5 border rounded-full mt-1 mr-3 flex-shrink-0 ${
-                      selectedAddress.id === addr.id
+                    className={`w-5 h-5 border rounded-full mt-1 mr-3 flex-shrink-0 ${selectedAddress.id === addr.id
                         ? "border-primary bg-primary"
                         : "border-gray-300"
-                    }`}
+                      }`}
                   >
                     {selectedAddress.id === addr.id && (
                       <div className="w-3 h-3 bg-white rounded-full m-1"></div>
