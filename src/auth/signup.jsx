@@ -85,6 +85,9 @@ export default function Signup() {
     if (formData.username.length < 3) {
       newErrors.username = "Username must be 3+ characters!";
       valid = false;
+    } else if (!/^[a-zA-Z]/.test(formData.username)) {
+      newErrors.username = "Username must start with a letter!";
+      valid = false;
     } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
       newErrors.username = "Only letters, numbers and underscores!";
       valid = false;
@@ -115,6 +118,7 @@ export default function Signup() {
     setErrors(newErrors);
     return valid;
   };
+
 
   // handle form submit
   const handleSubmit = async (e) => {
