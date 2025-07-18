@@ -229,7 +229,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
     if (
       product.quantity === undefined ||
       isNaN(product.quantity) ||
-      product.quantity < 1
+      product.quantity < 0
     ) {
       newErrors.quantity = "Please enter a valid quantity";
     }
