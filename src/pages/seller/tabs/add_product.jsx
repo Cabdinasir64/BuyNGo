@@ -110,6 +110,7 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
     mainImage: "",
     images: [],
     properties: [],
+    quantity: 1,
   };
 
   // state has 2 values or edit or not edit
@@ -117,7 +118,11 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
 
   useEffect(() => {
     if (initialProduct) {
-      setProduct(initialProduct);
+      setProduct({
+        ...defaultProductState,
+        ...initialProduct,
+        quantity: initialProduct.quantity ?? 0,
+      });
     } else {
       setProduct(defaultProductState);
     }
@@ -225,6 +230,13 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
     if (!product.mainImage) newErrors.mainImage = "Main image is required";
     if (!product.properties.length)
       newErrors.properties = "At least one property is required";
+    if (
+      product.quantity === undefined ||
+      isNaN(product.quantity) ||
+      product.quantity < 1
+    ) {
+      newErrors.quantity = "Please enter a valid quantity";
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -352,11 +364,10 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
             type="text"
             value={product.name}
             onChange={(e) => setProduct({ ...product, name: e.target.value })}
-            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-              errors.name
-                ? "border-red-500 focus:ring-red-300"
-                : "border-gray-300 focus:ring-primary focus:border-primary"
-            }`}
+            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.name
+              ? "border-red-500 focus:ring-red-300"
+              : "border-gray-300 focus:ring-primary focus:border-primary"
+              }`}
             placeholder="Enter product name"
           />
           {errors.name && (
@@ -377,11 +388,10 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
             type="number"
             value={product.price}
             onChange={(e) => setProduct({ ...product, price: e.target.value })}
-            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-              errors.price
-                ? "border-red-500 focus:ring-red-300"
-                : "border-gray-300 focus:ring-primary focus:border-primary"
-            }`}
+            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.price
+              ? "border-red-500 focus:ring-red-300"
+              : "border-gray-300 focus:ring-primary focus:border-primary"
+              }`}
             placeholder="Enter price (e.g., 10.99)"
             step="0.01"
             min="0.01"
@@ -404,11 +414,10 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
             onChange={(e) =>
               setProduct({ ...product, category: e.target.value })
             }
-            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors bg-white ${
-              errors.category
-                ? "border-red-500 focus:ring-red-300"
-                : "border-gray-300 focus:ring-primary focus:border-primary"
-            }`}
+            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors bg-white ${errors.category
+              ? "border-red-500 focus:ring-red-300"
+              : "border-gray-300 focus:ring-primary focus:border-primary"
+              }`}
           >
             <option value="">Select Category</option>
             {categoriesData.map((mainCat) => (
@@ -447,11 +456,10 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
             onChange={(e) =>
               setProduct({ ...product, description: e.target.value })
             }
-            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-              errors.description
-                ? "border-red-500 focus:ring-red-300"
-                : "border-gray-300 focus:ring-primary focus:border-primary"
-            }`}
+            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.description
+              ? "border-red-500 focus:ring-red-300"
+              : "border-gray-300 focus:ring-primary focus:border-primary"
+              }`}
             rows="4"
             placeholder="Enter product description"
           />
@@ -644,7 +652,36 @@ const AddProduct = ({ initialProduct, onSave, onCancel, onSuccess }) => {
             )}
           </div>
         </div>
-
+        <div>
+          <label
+            htmlFor="productQuantity"
+            className="block text-sm font-medium text-dark-muted mb-1"
+          >
+            Quantity in Stock *
+          </label>
+          <div className="relative">
+            <input
+              id="productQuantity"
+              type="number"
+              value={product.quantity}
+              onChange={(e) => {
+                setProduct({
+                  ...product,
+                  quantity: e.target.value
+                });
+              }
+              }
+              className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.quantity
+                ? "border-red-500 focus:ring-red-300"
+                : "border-gray-300 focus:ring-primary focus:border-primary"
+                }`}
+              placeholder="Enter available quantity"
+            />
+            {errors.quantity && (
+              <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+            )}
+          </div>
+        </div>
         {/* Submit Button */}
         <div className="pt-6">
           <button
