@@ -113,7 +113,6 @@ const Checkout = () => {
     setSuccess("");
 
     try {
-      // 1. Update stock for each product one by one
       for (const item of cartItems) {
         const productRef = firebase.firestore().collection("products").doc(item.productId);
         const productDoc = await productRef.get();
@@ -133,7 +132,6 @@ const Checkout = () => {
         });
       }
 
-      // 2. Add order document
       await firebase.firestore().collection("orders").add({
         sellerId: sellerId,
         buyerId: user.uid,
@@ -144,7 +142,6 @@ const Checkout = () => {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
 
-      // 3. Clear the cart
       await firebase.firestore().collection("carts").doc(user.uid).delete();
 
       setSuccess("Order placed successfully!");
