@@ -45,6 +45,15 @@ function AddToCartButton({ product, user, className }) {
                 const itemExist = items.findIndex((item) => item.productId === product.id);
 
                 if (itemExist > -1) {
+                    const currentQuantity = items[itemExist].quantity;
+
+                    if (currentQuantity >= product.quantity) {
+                        setErrors("You've reached the maximum stock limit");
+                        setSuccess("");
+                        clearMessages();
+                        return;
+                    }
+
                     items[itemExist].quantity += 1;
                 } else {
                     items.push({
@@ -82,6 +91,7 @@ function AddToCartButton({ product, user, className }) {
             <button
                 onClick={addToCart}
                 className={className || ""}
+                disabled={!product.quantity || product.quantity === 0}
             >
                 {product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
             </button>
