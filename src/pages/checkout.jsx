@@ -122,14 +122,14 @@ const Checkout = () => {
           throw new Error(`Product ${item.name} does not exist.`);
         }
 
-        const currentStock = productDoc.data().stock;
+        const currentStock = productDoc.data().quantity;
 
         if (currentStock < item.quantity) {
           throw new Error(`Insufficient stock for product ${item.name}.`);
         }
 
         await productRef.update({
-          stock: currentStock - item.quantity,
+          quantity: currentStock - item.quantity,
         });
       }
 
