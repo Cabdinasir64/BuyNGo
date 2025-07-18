@@ -58,6 +58,15 @@ const Cart = () => {
     if (newQuantity < 1 || !user) return;
 
     try {
+      const productDoc = await firebase.firestore().collection("products").doc(productId).get();
+      const productData = productDoc.data();
+      const stock = productData.quantity || 0;
+
+      if (newQuantity > stock) {
+        setErrorMessage(`Only ${stock} in stock`);
+        return;
+      }
+
       const cartRef = firebase.firestore().collection("carts").doc(user.uid);
       const cartDoc = await cartRef.get();
 
@@ -72,14 +81,21 @@ const Cart = () => {
         });
 
         await cartRef.update({ items: updatedItems });
-
-        setCartItems(updatedItems);
+        setCartItems((prev) =>
+          prev.map((item) =>
+            item.productId === productId
+              ? { ...item, quantity: newQuantity }
+              : item
+          )
+        );
         setSuccessMessage("Quantity updated successfully");
       }
     } catch (error) {
       setErrorMessage("Error updating quantity");
+      console.error("Error updating quantity:", error);
     }
   };
+
 
   // deleting cart item
   const deleteItem = async (productId) => {
@@ -143,19 +159,19 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-12 px-4 sm:px-6 lg:px-8">
       {successMessage && (
-        <div className="mb-4 bg-green-100 text-green-800 border border-green-200 px-4 py-2 rounded">
+        <div className="fixed -mt-12 w-3xl bg-green-100 text-green-800 border border-green-200 px-4 py-2 rounded">
           {successMessage}
         </div>
       )}
       {errorMessage && (
-        <div className="mb-4 bg-red-100 text-red-800 border border-red-200 px-4 py-2 rounded">
+        <div className="fixed -mt-12 w-3xl bg-red-100 text-red-800 border border-red-200 px-4 py-2 rounded">
           {errorMessage}
         </div>
       )}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.3 }}
         className="max-w-4xl mx-auto"
       >
         <div className="flex items-center mb-8">
@@ -188,7 +204,7 @@ const Cart = () => {
                 Looks like you haven't added anything to your cart yet
               </p>
               <button
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/shopping")}
                 className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
               >
                 Continue Shopping
@@ -203,7 +219,7 @@ const Cart = () => {
                     layout
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, x: -100 }}
+                    exit={{ opacity: 0, x: -50 }}
                     transition={{ duration: 0.3 }}
                     className="bg-white rounded-xl shadow-sm overflow-hidden"
                   >
@@ -233,13 +249,11 @@ const Cart = () => {
                             <div className="flex items-center mt-2">
                               <button
                                 onClick={() =>
-                                  updateQuantity(
-                                    item.productId,
-                                    item.quantity - 1
-                                  )
+                                  item.quantity === 1
+                                    ? deleteItem(item.productId)
+                                    : updateQuantity(item.productId, item.quantity - 1)
                                 }
                                 className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-                                disabled={item.quantity <= 1}
                               >
                                 <FaMinus className="text-gray-600" />
                               </button>
@@ -325,7 +339,7 @@ const Cart = () => {
                   </motion.button>
 
                   <button
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/shopping")}
                     className="w-full mt-4 text-primary hover:text-primary-dark py-2 rounded-lg font-medium transition"
                   >
                     Continue Shopping
