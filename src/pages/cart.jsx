@@ -81,25 +81,17 @@ const Cart = () => {
             updatedItems.push({ ...item, quantity: newQty });
           }
         }
-
-        const isChanged =
-          items.length !== updatedItems.length ||
-          items.some((item, i) => item.quantity !== updatedItems[i]?.quantity);
-
-        if (isChanged) {
-          await firebase
-            .firestore()
-            .collection("carts")
-            .doc(user.uid)
-            .update({ items: updatedItems });
-        }
+        await firebase
+          .firestore()
+          .collection("carts")
+          .doc(user.uid)
+          .update({ items: updatedItems });
 
         setCartItems(updatedItems);
       });
 
     return () => stopListening();
   }, [user]);
-
 
 
 
