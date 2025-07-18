@@ -39,9 +39,9 @@ const Product = () => {
   const averageRating =
     reviews.length > 0
       ? (
-          reviews.reduce((sum, review) => sum + review.rating, 0) /
-          reviews.length
-        ).toFixed(1)
+        reviews.reduce((sum, review) => sum + review.rating, 0) /
+        reviews.length
+      ).toFixed(1)
       : 0;
 
   useEffect(() => {
@@ -256,11 +256,10 @@ const Product = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleImageChange(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden cursor-pointer border-2 ${
-                      selectedImage === index
-                        ? "border-primary"
-                        : "border-transparent"
-                    }`}
+                    className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden cursor-pointer border-2 ${selectedImage === index
+                      ? "border-primary"
+                      : "border-transparent"
+                      }`}
                   >
                     <img
                       src={img}
@@ -296,11 +295,28 @@ const Product = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="bg-primary/10 p-4 rounded-lg"
+              className="bg-primary/10 p-4 rounded-lg space-y-2"
             >
               <p className="text-primary font-bold text-3xl mb-1">
                 ${product.price}
               </p>
+
+              {product.quantity > 0 ? (
+                <p
+                  className={`text-sm font-medium ${product.quantity < 5
+                    ? "text-red-500 animate-pulse"
+                    : "text-green-600"
+                    }`}
+                >
+                  {product.quantity < 5
+                    ? `Only ${product.quantity} left in stock!`
+                    : `${product.quantity} items available`}
+                </p>
+              ) : (
+                <p className="text-sm font-medium text-gray-500 line-through">
+                  Out of stock
+                </p>
+              )}
             </motion.div>
 
             {/* Description */}
@@ -495,11 +511,10 @@ const Product = () => {
                         onClick={() =>
                           setNewReview({ ...newReview, rating: star })
                         }
-                        className={`text-2xl ${
-                          newReview.rating >= star
-                            ? "text-yellow-400"
-                            : "text-gray-300"
-                        }`}
+                        className={`text-2xl ${newReview.rating >= star
+                          ? "text-yellow-400"
+                          : "text-gray-300"
+                          }`}
                       >
                         <FaStar />
                       </button>
