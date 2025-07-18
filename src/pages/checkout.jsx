@@ -430,8 +430,8 @@ const Checkout = () => {
               <label
                 key={addr.id}
                 className={`block border p-4 rounded-lg cursor-pointer transition ${selectedAddress.id === addr.id
-                    ? "border-primary bg-primary/10"
-                    : "border-gray-200 hover:border-primary"
+                  ? "border-primary bg-primary/10"
+                  : "border-gray-200 hover:border-primary"
                   }`}
               >
                 <input
@@ -445,8 +445,8 @@ const Checkout = () => {
                 <div className="flex">
                   <div
                     className={`w-5 h-5 border rounded-full mt-1 mr-3 flex-shrink-0 ${selectedAddress.id === addr.id
-                        ? "border-primary bg-primary"
-                        : "border-gray-300"
+                      ? "border-primary bg-primary"
+                      : "border-gray-300"
                       }`}
                   >
                     {selectedAddress.id === addr.id && (
