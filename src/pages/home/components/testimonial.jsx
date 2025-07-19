@@ -108,6 +108,8 @@ function Testimonials() {
                                     src={testimonial.image}
                                     alt={testimonial.name}
                                     className="w-16 h-16 rounded-full mb-4 object-cover"
+                                    loadig="lazy"
+
                                 />
                                 <FaQuoteLeft className="text-primary-dark text-2xl mb-2" />
                                 <p className="text-gray-700 italic mb-4">"{testimonial.feedback}"</p>
