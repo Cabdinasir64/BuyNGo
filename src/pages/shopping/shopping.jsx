@@ -213,9 +213,8 @@ const Shopping = () => {
                     className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10"
                   >
                     <button
-                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                        sortOption === "A-Z" ? "bg-gray-100" : ""
-                      }`}
+                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === "A-Z" ? "bg-gray-100" : ""
+                        }`}
                       onClick={() => {
                         setSortOption("A-Z");
                         setShowSortMenu(false);
@@ -224,9 +223,8 @@ const Shopping = () => {
                       <FaArrowUp className="inline mr-2" /> A-Z
                     </button>
                     <button
-                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                        sortOption === "Z-A" ? "bg-gray-100" : ""
-                      }`}
+                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === "Z-A" ? "bg-gray-100" : ""
+                        }`}
                       onClick={() => {
                         setSortOption("Z-A");
                         setShowSortMenu(false);
@@ -235,9 +233,8 @@ const Shopping = () => {
                       <FaArrowDown className="inline mr-2" /> Z-A
                     </button>
                     <button
-                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                        sortOption === "price-low" ? "bg-gray-100" : ""
-                      }`}
+                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === "price-low" ? "bg-gray-100" : ""
+                        }`}
                       onClick={() => {
                         setSortOption("price-low");
                         setShowSortMenu(false);
@@ -246,9 +243,8 @@ const Shopping = () => {
                       <FaArrowUp className="inline mr-2" /> Price: Low to High
                     </button>
                     <button
-                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                        sortOption === "price-high" ? "bg-gray-100" : ""
-                      }`}
+                      className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === "price-high" ? "bg-gray-100" : ""
+                        }`}
                       onClick={() => {
                         setSortOption("price-high");
                         setShowSortMenu(false);
@@ -298,6 +294,8 @@ const Shopping = () => {
                         alt={product.name}
                         className="w-full h-full object-cover"
                         onClick={() => handleProductClick(product)}
+                        loadig="lazy"
+
                       />
                     </div>
                     <div className="p-4">
@@ -329,11 +327,10 @@ const Shopping = () => {
                     <button
                       key={idx}
                       onClick={() => paginate(idx + 1)}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === idx + 1
+                      className={`px-3 py-1 rounded ${currentPage === idx + 1
                           ? "bg-primary text-white"
                           : "bg-white hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       {idx + 1}
                     </button>
