@@ -211,6 +211,8 @@ function Product() {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
                       onClick={() => handleProductClick(product)}
+                      loadig="lazy"
+
                     />
                   </div>
 
