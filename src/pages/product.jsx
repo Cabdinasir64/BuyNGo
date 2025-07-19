@@ -243,6 +243,8 @@ const Product = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
+                  loadig="lazy"
+
                 />
               </AnimatePresence>
             </div>
@@ -580,6 +582,8 @@ const Product = () => {
                     alt={product.name}
                     className="w-full h-40 object-cover"
                     onClick={() => handleProductClick(product)}
+                    loadig="lazy"
+
                   />
                   <div className="p-3">
                     <h3 className="font-medium text-gray-900 truncate">
