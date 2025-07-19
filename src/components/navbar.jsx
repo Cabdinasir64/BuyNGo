@@ -201,22 +201,27 @@ const Navbar = () => {
       setResults([]);
       return;
     }
+
     const fetchProducts = async () => {
       setLoading(true);
       try {
         const snapshot = await firebase
           .firestore()
           .collection("products")
-          .limit(10)
           .get();
 
         const prods = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        const filterSearch = prods.filter((result) =>
-          result.name.toLowerCase().includes(query.toLowerCase())
-        );
+
+        const filterSearch = prods.filter((result) => {
+          const q = query.toLowerCase();
+          return (
+            result.name.toLowerCase().includes(q) ||
+            result.description.toLowerCase().includes(q)
+          );
+        });
 
         setResults(filterSearch);
       } catch (err) {
@@ -226,8 +231,10 @@ const Navbar = () => {
         setLoading(false);
       }
     };
+
     fetchProducts();
   }, [query]);
+
 
   // product details
   const handleProductClick = (product) => {
