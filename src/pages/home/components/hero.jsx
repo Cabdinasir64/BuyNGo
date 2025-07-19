@@ -84,6 +84,7 @@ const Hero = () => {
                             <div
                                 className="absolute inset-0 bg-cover bg-center"
                                 style={{ backgroundImage: `url(${slide.image})` }}
+                                loadig="lazy"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-dark/70 to-transparent" />
 
