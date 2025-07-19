@@ -179,6 +179,8 @@ const AllProducts = () => {
                     src={product.mainImage}
                     alt={product.name}
                     className="w-full h-full object-cover"
+                    loadig="lazy"
+
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
