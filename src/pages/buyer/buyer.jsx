@@ -44,7 +44,7 @@ const SellerDashboard = () => {
             {/* Mobile sidebar toggle */}
             <div className="md:hidden fixed top-0 left-0 right-0 bg-primary p-4 flex justify-between items-center z-30 shadow-md">
                 <h1 className="text-xl font-bold text-white font-heading">
-                    Seller Dashboard
+                    Buyer Dashboard
                 </h1>
                 <motion.button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -90,7 +90,7 @@ const SellerDashboard = () => {
             >
                 <div className="p-4 border-b border-primary">
                     <h2 className="text-2xl font-bold font-heading text-center">
-                        Seller Panel
+                        Buyer Panel
                     </h2>
                 </div>
 
