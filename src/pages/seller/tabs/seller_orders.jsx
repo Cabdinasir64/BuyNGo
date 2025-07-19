@@ -72,6 +72,25 @@ const SellerOrdersTab = () => {
         return;
       }
 
+      const orderData = docSnap.data();
+      const user = firebase.auth().currentUser;
+
+      const sellerItems = orderData.items.filter(
+        (item) => item.sellerId === user.uid
+      );
+
+      if (newStatus === "cancelled") {
+        for (const item of sellerItems) {
+          const productRef = firebase.firestore().collection("products").doc(item.productId);
+          const productSnap = await productRef.get();
+          if (productSnap.exists) {
+            const productData = productSnap.data();
+            const updatedStock = (productData.quantity || 0) + item.quantity;
+            await productRef.update({ quantity: updatedStock });
+          }
+        }
+      }
+
       await docRef.update({
         status: newStatus,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -87,51 +106,73 @@ const SellerOrdersTab = () => {
     }
   };
 
-  const handleDeleteOrder = async (orderId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete your items from this order?"
-      )
-    )
+
+  const handleClearHistory = async () => {
+    const user = firebase.auth().currentUser;
+    if (!user) {
       return;
+    }
 
-    setProcessing(orderId);
+    if (!window.confirm("Are you sure you want to clear all your order history (except pending)?")) return;
+
     try {
-      const docRef = firebase.firestore().collection("orders").doc(orderId);
-      const docSnap = await docRef.get();
+      const snapshot = await firebase
+        .firestore()
+        .collection("orders")
+        .orderBy("createdAt", "desc")
+        .get();
 
-      if (!docSnap.exists) {
-        setError("Order not found.");
-        setProcessing(null);
-        setTimeout(() => setError(""), 3000);
-        return;
+      for (const doc of snapshot.docs) {
+        const data = doc.data();
+
+        const sellerItems = data.items?.filter((item) => item.sellerId === user.uid) || [];
+        if (sellerItems.length === 0) continue;
+        if (data.status === "pending") continue;
+
+        const sellerTotal = sellerItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
+        const orderToSave = {
+          ...data,
+          items: sellerItems,
+          total: sellerTotal,
+          sellerId: user.uid,
+          originalOrderId: doc.id,
+          clearedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        };
+
+
+        await firebase.firestore().collection("historyorders").add(orderToSave);
+
+        const remainingItems = data.items.filter(item => item.sellerId !== user.uid);
+
+        if (remainingItems.length === 0) {
+          await doc.ref.delete();
+        } else {
+          console.log("Updating order:", doc.id, "with remaining items:", remainingItems);
+          await doc.ref.update({
+            items: remainingItems,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        }
       }
 
-      const data = docSnap.data();
-      const user = firebase.auth().currentUser;
-
-      const updatedItems = data.items.filter(
-        (item) => item.sellerId !== user.uid
-      );
-
-      if (updatedItems.length === 0) {
-        await docRef.delete();
-      } else {
-        await docRef.update({
-          items: updatedItems,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        });
-      }
-
-      setSuccess("Your order items deleted successfully.");
+      setSuccess("History cleared and saved successfully.");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError("Failed to delete your order items");
+      console.error("Error in handleClearHistory:", err);
+      setError("Failed to clear history.");
       setTimeout(() => setError(""), 3000);
-    } finally {
-      setProcessing(null);
     }
   };
+
+
+
+
+
+
 
   if (loading) {
     return (
@@ -143,10 +184,19 @@ const SellerOrdersTab = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <FaShoppingBag /> Sales Orders
-      </h1>
-
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
+          <FaShoppingBag /> Sales Orders
+        </h1>
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={handleClearHistory}
+            className="bg-primary hover:bg-primary/80 text-white px-4 py-2 rounded"
+          >
+            Clear All History
+          </button>
+        </div>
+      </div>
       {error && (
         <div className="bg-accent-red/10 border-l-4 border-accent-red text-accent-red p-4 mb-6 rounded">
           {error}
@@ -169,13 +219,12 @@ const SellerOrdersTab = () => {
               key={order.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`border rounded-lg overflow-hidden ${
-                order.status === "confirmed"
-                  ? "bg-green-50 border-green-200"
-                  : order.status === "cancelled"
+              className={`border rounded-lg overflow-hidden ${order.status === "confirmed"
+                ? "bg-green-50 border-green-200"
+                : order.status === "cancelled"
                   ? "bg-red-50 border-red-200"
                   : "bg-white border-gray-200"
-              }`}
+                }`}
             >
               <div className="p-4 border-b flex justify-between items-center">
                 <div>
@@ -188,13 +237,12 @@ const SellerOrdersTab = () => {
                   </p>
                 </div>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    order.status === "confirmed"
-                      ? "bg-green-100 text-green-800"
-                      : order.status === "cancelled"
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === "confirmed"
+                    ? "bg-green-100 text-green-800"
+                    : order.status === "cancelled"
                       ? "bg-red-100 text-red-800"
                       : "bg-yellow-100 text-yellow-800"
-                  }`}
+                    }`}
                 >
                   {order.status}
                 </span>
@@ -265,21 +313,6 @@ const SellerOrdersTab = () => {
                       )}
                     </button>
                   </>
-                )}
-                {order.status === "cancelled" && (
-                  <button
-                    onClick={() => handleDeleteOrder(order.id)}
-                    disabled={processing === order.id}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50"
-                  >
-                    {processing === order.id ? (
-                      "Deleting..."
-                    ) : (
-                      <>
-                        <FaTrash /> Delete
-                      </>
-                    )}
-                  </button>
                 )}
               </div>
             </motion.div>
