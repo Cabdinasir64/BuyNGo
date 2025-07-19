@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import firebase from "/firebase";
 import { useNavigate } from "react-router-dom";
-import { FaBox, FaChevronDown, FaPlus, FaList } from "react-icons/fa";
+import { FaBox, FaChevronDown, FaPlus, FaList, FaHistory } from "react-icons/fa";
 import { FaBasketShopping } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 import ProfileTab from "./tabs/profile";
 import AddProductTab from "./tabs/add_product";
 import AllProductsTab from "./tabs/all_products";
 import OrdersTab from "./tabs/seller_orders";
+import OrderHistoryTab from './tabs/order_history'
 
 const SellerDashboard = () => {
   const navigate = useNavigate();
@@ -37,6 +38,8 @@ const SellerDashboard = () => {
         return <ProfileTab />;
       case "orders":
         return <OrdersTab />;
+      case "order-history":
+        return <OrderHistoryTab />;
       default:
         return null;
     }
@@ -93,9 +96,8 @@ const SellerDashboard = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 md:static w-64 bg-primary-dark text-white transition-transform duration-300 ease-in-out z-20 flex flex-col shadow-lg`}
+        className={`fixed inset-y-0 left-0 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 md:static w-64 bg-primary-dark text-white transition-transform duration-300 ease-in-out z-20 flex flex-col shadow-lg`}
       >
         <div className="p-4 border-b border-primary">
           <h2 className="text-2xl font-bold font-heading text-center">
@@ -115,9 +117,8 @@ const SellerDashboard = () => {
               <FaBox className="text-lg" />
               <span>Products</span>
               <FaChevronDown
-                className={`ml-auto text-sm transition-transform ${
-                  isProductsOpen ? "rotate-180" : ""
-                }`}
+                className={`ml-auto text-sm transition-transform ${isProductsOpen ? "rotate-180" : ""
+                  }`}
               />
             </motion.button>
 
@@ -128,11 +129,10 @@ const SellerDashboard = () => {
                     setActiveTab("add-product");
                     setIsSidebarOpen(false);
                   }}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${
-                    activeTab === "add-product"
-                      ? "bg-primary/80 text-white"
-                      : "hover:bg-primary/50"
-                  }`}
+                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${activeTab === "add-product"
+                    ? "bg-primary/80 text-white"
+                    : "hover:bg-primary/50"
+                    }`}
                 >
                   <FaPlus className="text-sm" />
                   <span>Add Product</span>
@@ -143,11 +143,10 @@ const SellerDashboard = () => {
                     setActiveTab("all-products");
                     setIsSidebarOpen(false);
                   }}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${
-                    activeTab === "all-products"
-                      ? "bg-primary/80 text-white"
-                      : "hover:bg-primary/50"
-                  }`}
+                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${activeTab === "all-products"
+                    ? "bg-primary/80 text-white"
+                    : "hover:bg-primary/50"
+                    }`}
                 >
                   <FaList className="text-sm" />
                   <span>All Products</span>
@@ -160,11 +159,10 @@ const SellerDashboard = () => {
               setActiveTab("profile");
               setIsSidebarOpen(false);
             }}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${
-              activeTab === "profile"
-                ? "bg-primary text-white hover:bg-primary/80"
-                : "hover:bg-primary"
-            }`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${activeTab === "profile"
+              ? "bg-primary text-white hover:bg-primary/80"
+              : "hover:bg-primary"
+              }`}
             layout="activeTabIndicator"
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
@@ -176,17 +174,32 @@ const SellerDashboard = () => {
               setActiveTab("orders");
               setIsSidebarOpen(false);
             }}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${
-              activeTab === "orders"
-                ? "bg-primary text-white hover:bg-primary/80"
-                : "hover:bg-primary"
-            }`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${activeTab === "orders"
+              ? "bg-primary text-white hover:bg-primary/80"
+              : "hover:bg-primary"
+              }`}
             layout="activeTabIndicator"
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
             <FaBasketShopping className="text-lg" />
             <span>Orders</span>
           </motion.button>
+          <motion.button
+            onClick={() => {
+              setActiveTab("order-history");
+              setIsSidebarOpen(false);
+            }}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-150 ease-in-out font-medium flex items-center gap-2 ${activeTab === "order-history"
+              ? "bg-primary text-white hover:bg-primary/80"
+              : "hover:bg-primary"
+              }`}
+            layout="activeTabIndicator"
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          >
+            <FaHistory className="text-lg" />
+            <span>Order History</span>
+          </motion.button>
+
         </nav>
 
         <div className="p-4 border-t-2 border-primary">
