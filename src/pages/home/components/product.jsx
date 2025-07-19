@@ -97,77 +97,79 @@ function Product() {
         <AnimatePresence>
           {loading
             ? Array(8)
-                .fill(0)
-                .map((_, idx) => <SkeletonCard key={`skeleton-${idx}`} />)
+              .fill(0)
+              .map((_, idx) => <SkeletonCard key={`skeleton-${idx}`} />)
             : products.map((product, idx) => (
-                <motion.div
-                  key={product.id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -5 }}
-                  transition={{
-                    delay: idx * 0.01,
-                    duration: 0.1,
-                    ease: "easeInOut",
-                  }}
-                  layout
-                >
-                  <div className="relative">
-                    <motion.img
-                      src={product.mainImage}
-                      alt={product.name}
-                      className="w-full h-60 object-cover"
+              <motion.div
+                key={product.id}
+                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -5 }}
+                transition={{
+                  delay: idx * 0.01,
+                  duration: 0.1,
+                  ease: "easeInOut",
+                }}
+                layout
+              >
+                <div className="relative">
+                  <motion.img
+                    src={product.mainImage}
+                    alt={product.name}
+                    className="w-full h-60 object-cover"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    onClick={() => handleProductClick(product)}
+                    loadig="lazy"
+
+                  />
+                </div>
+
+                <div className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <motion.h3
+                      className="font-heading font-semibold text-lg text-dark truncate"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                      onClick={() => handleProductClick(product)}
-                    />
+                      transition={{ delay: 0.2 }}
+                    >
+                      {product.name}
+                    </motion.h3>
                   </div>
 
-                  <div className="p-5">
-                    <div className="flex justify-between items-start mb-2">
-                      <motion.h3
-                        className="font-heading font-semibold text-lg text-dark truncate"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        {product.name}
-                      </motion.h3>
-                    </div>
-
-                    <motion.div
-                      className="flex items-center mb-4"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                    >
-                      <span className="text-primary font-bold text-xl">
-                        ${product.price}
+                  <motion.div
+                    className="flex items-center mb-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <span className="text-primary font-bold text-xl">
+                      ${product.price}
+                    </span>
+                    {product.originalPrice && (
+                      <span className="ml-2 text-dark-muted text-sm line-through">
+                        ${product.originalPrice}
                       </span>
-                      {product.originalPrice && (
-                        <span className="ml-2 text-dark-muted text-sm line-through">
-                          ${product.originalPrice}
-                        </span>
-                      )}
-                    </motion.div>
+                    )}
+                  </motion.div>
 
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                    >
-                      <AddToCartButton
-                        product={product}
-                        user={user}
-                        className="w-full py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition flex items-center justify-center gap-2"
-                      />
-                    </motion.div>
-                  </div>
-                </motion.div>
-              ))}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <AddToCartButton
+                      product={product}
+                      user={user}
+                      className="w-full py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition flex items-center justify-center gap-2"
+                    />
+                  </motion.div>
+                </div>
+              </motion.div>
+            ))}
         </AnimatePresence>
       </div>
       {/* Mobile Carousel */}
@@ -176,77 +178,77 @@ function Product() {
           <AnimatePresence>
             {loading
               ? Array(3)
-                  .fill(0)
-                  .map((_, idx) => (
-                    <div
-                      key={`mobile-skeleton-${idx}`}
-                      className="min-w-[280px]"
-                    >
-                      <SkeletonCard />
-                    </div>
-                  ))
-              : products.map((product, idx) => (
-                  <motion.div
-                    key={product.id}
-                    className="min-w-[280px] bg-white rounded-xl shadow-lg overflow-hidden flex flex-col"
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    whileHover={{ scale: 1.02 }}
-                    viewport={{ once: true, margin: "0px 0px -50px 0px" }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 100,
-                      damping: 10,
-                    }}
-                    layout
+                .fill(0)
+                .map((_, idx) => (
+                  <div
+                    key={`mobile-skeleton-${idx}`}
+                    className="min-w-[280px]"
                   >
-                    <div className="relative">
-                      <motion.img
-                        src={product.mainImage}
-                        alt={product.name}
-                        className="w-full h-48 object-cover"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        onClick={() => handleProductClick(product)}
+                    <SkeletonCard />
+                  </div>
+                ))
+              : products.map((product, idx) => (
+                <motion.div
+                  key={product.id}
+                  className="min-w-[280px] bg-white rounded-xl shadow-lg overflow-hidden flex flex-col"
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  whileHover={{ scale: 1.02 }}
+                  viewport={{ once: true, margin: "0px 0px -50px 0px" }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 10,
+                  }}
+                  layout
+                >
+                  <div className="relative">
+                    <motion.img
+                      src={product.mainImage}
+                      alt={product.name}
+                      className="w-full h-48 object-cover"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      onClick={() => handleProductClick(product)}
+                    />
+                  </div>
+
+                  <div className="p-4 flex-grow flex flex-col">
+                    <motion.h3
+                      className="font-heading font-semibold text-dark mb-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      {product.name}
+                    </motion.h3>
+                    <motion.div
+                      className="flex items-center mb-3"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <span className="text-primary font-bold">
+                        ${product.price}
+                      </span>
+                    </motion.div>
+
+                    <motion.div
+                      className="mt-auto"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      <AddToCartButton
+                        product={product}
+                        user={user}
+                        className="w-full py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm"
                       />
-                    </div>
-
-                    <div className="p-4 flex-grow flex flex-col">
-                      <motion.h3
-                        className="font-heading font-semibold text-dark mb-2"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                      >
-                        {product.name}
-                      </motion.h3>
-                      <motion.div
-                        className="flex items-center mb-3"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.4 }}
-                      >
-                        <span className="text-primary font-bold">
-                          ${product.price}
-                        </span>
-                      </motion.div>
-
-                      <motion.div
-                        className="mt-auto"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                      >
-                        <AddToCartButton
-                          product={product}
-                          user={user}
-                          className="w-full py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm"
-                        />
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  </div>
+                </motion.div>
+              ))}
           </AnimatePresence>
         </div>
       </div>
