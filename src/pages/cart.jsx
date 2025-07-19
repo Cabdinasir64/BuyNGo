@@ -279,6 +279,8 @@ const Cart = () => {
                               src={item.mainImage}
                               alt={item.name}
                               className="w-full h-full object-cover"
+                              loadig="lazy"
+
                             />
                           </div>
 
