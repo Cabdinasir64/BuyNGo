@@ -270,6 +270,8 @@ const Checkout = () => {
                   src={item.mainImage}
                   alt={item.name}
                   className="w-16 h-16 object-cover rounded mr-4"
+                  loadig="lazy"
+
                 />
                 <div>
                   <h4 className="font-medium">{item.name}</h4>
